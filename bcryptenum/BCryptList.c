@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.1.2
+// Version: 2.1.3
 //
 // Change history:
 //    2023-12-01: V1.0.0: Created.
@@ -35,6 +35,7 @@
 //    2025-11-14: V2.1.0: Removed wide character functions.
 //    2025-12-22: V2.1.1: Corrected casing of function names.
 //    2025-12-22: V2.1.2: More compact list.
+//    2025-12-22: V2.1.3: Handle empty algorithm list.
 //
 
 #define _CRT_DISABLE_PERFCRIT_LOCKS 1
@@ -170,6 +171,13 @@ static BOOL ListForType(const HANDLE hHeap, const ULONG algorithmType, FILE* fSt
    if (nts < 0) {
       PrintNtStatus(functionName, "BCryptEnumAlgorithms", nts);
       return FALSE;
+   }
+
+   // 2.1 Check, if any algorithms were found.
+   if (algoCount == 0) {
+      fputs("   <no algorithms found>\n", fStdOut);
+      BCryptFreeBuffer(pAlgoList);
+      return TRUE;
    }
 
    // 3. Sort the algorithm names.
