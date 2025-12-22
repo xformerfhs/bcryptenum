@@ -20,11 +20,12 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.0.1
+// Version: 1.1.0
 //
 // Change history:
 //    2025-11-13: V1.0.0: Created.
 //    2025-12-22: V1.0.1: Corrected function naming.
+//    2025-12-22: V1.1.0: Removed unnecessary "fast" divmod function which in reality is much slower than normal divmod.
 //
 
 #include <stdint.h>
@@ -43,28 +44,6 @@
 
 /// Buffer for formatting numbers with thousands grouping separators.
 char numberBuffer[BUFFER_SIZE];
-
-
-// ******** Private methods ********
-
-/// <summary>
-/// Fast division and modulo by 10 for unsigned 16-bit integers.
-/// </summary>
-/// <param name="in">Number to divide.</param>
-/// <param name="pDivResult">Pointer to store the division result.</param>
-/// <param name="pModResult">Pointer to store the modulo result.</param>
-static inline void FastDivMod10Uint16(uint16_t const in, uint16_t* const pDivResult, uint16_t* const pModResult) {
-   uint16_t x = (in | 1) - (in >> 2);
-   uint16_t q = x + (x >> 4);  // x * 1.0625
-
-   x = q;
-   q = (q >> 8) + x;
-   q = (q >> 8) + x;
-
-   uint16_t divResult = (q >> 3);
-   *pDivResult = divResult;
-   *pModResult = in - ((q & ~7) + (divResult << 1));
-}
 
 
 // ******** Public methods ********
@@ -87,13 +66,12 @@ char* FormatUint16WithSeparator(uint16_t const aNumber, char const separator) {
          groupCount = 0;
       }
 
-      uint16_t divResult;
-      uint16_t modResult;
-      FastDivMod10Uint16(last, &divResult, &modResult);
+      uint16_t div10 = last / 10;
+      uint16_t mod10 = last % 10;
 
-      *pBuffer-- = (char)modResult + '0';
+      *pBuffer-- = (char)mod10 + '0';
       groupCount++;
-      last = divResult;
+      last = div10;
    } while (last != 0);
 
    return ++pBuffer;
@@ -119,12 +97,11 @@ char* FormatUint16Number(const uint16_t aNumber) {
    *pBuffer-- = 0;  // Set terminating zero.
 
    do {
-      uint16_t divResult;
-      uint16_t modResult;
-      FastDivMod10Uint16(last, &divResult, &modResult);
+       uint16_t div10 = last / 10;
+       uint16_t mod10 = last % 10;
 
-      *pBuffer-- = (char)modResult + '0';
-      last = divResult;
+      *pBuffer-- = (char)mod10 + '0';
+      last = div10;
    } while (last != 0);
 
    return ++pBuffer;

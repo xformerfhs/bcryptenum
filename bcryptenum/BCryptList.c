@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.1.1
+// Version: 2.1.2
 //
 // Change history:
 //    2023-12-01: V1.0.0: Created.
@@ -34,6 +34,7 @@
 //    2025-11-12: V2.0.0: Print to console in console code page.
 //    2025-11-14: V2.1.0: Removed wide character functions.
 //    2025-12-22: V2.1.1: Corrected casing of function names.
+//    2025-12-22: V2.1.2: More compact list.
 //
 
 #define _CRT_DISABLE_PERFCRIT_LOCKS 1
@@ -122,7 +123,7 @@ static void PrintAlgorithmTypeName(const ULONG algorithmType, FILE* fStdOut) {
       fprintf(stderr, "Unknown algorithm type 0x%lx", algorithmType);
    }
 
-   fputs(":\n\n", fStdOut);
+   fputs(":\n", fStdOut);
 }
 
 /// <summary>
@@ -195,10 +196,7 @@ static BOOL ListForType(const HANDLE hHeap, const ULONG algorithmType, FILE* fSt
       _putc_nolock('\n', fStdOut);
    }
 
-   // 5. Add a new line at the end of the list.
-   _putc_nolock('\n', fStdOut);
-
-   // 6. Release memory.
+   // 5. Release memory.
    HeapFree(hHeap, 0, pSortedList);  // This must be freed *before* the algorithm list is freed.
    BCryptFreeBuffer(pAlgoList);      // This must be freed *after* the names have been printed.
 
@@ -219,7 +217,7 @@ unsigned char ListAllTypes() {
    // 1. Print header.
    fputs("\nList of Bcrypt ", fStdOut);
    PrintModuleVersion("bcrypt.dll", fStdOut);
-   fputs(" algorithms by type:\n\n", fStdOut);
+   fputs(" algorithms by type:\n", fStdOut);
    
    // 2. Get the process heap to use in the list functions.
    
