@@ -35,10 +35,12 @@
 #include "ApiErrorHandler.h"
 #include "NumberFormatter.h"
 
+
 // ******** Private data ********
 
 // Hopefully the file path will be less than MAX_PATH - 1 characters...
 CHAR fileName[MAX_PATH];
+
 
 // ******** Public methods ********
 

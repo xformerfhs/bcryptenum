@@ -53,6 +53,7 @@
 #define RC_OK  0
 #define RC_ERR 0xff
 
+
 // ******** Private methods ********
 
 /// <summary>

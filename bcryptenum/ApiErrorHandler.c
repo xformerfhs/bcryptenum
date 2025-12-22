@@ -34,14 +34,17 @@
 
 #include "Console.h"
 
+
 // ******** Private constants ********
 
 #define MESSAGE_BUFFER_LENGTH 256
+
 
 // ******** Private variables ********
 
 /// Buffer for wide character error message text.
 static WCHAR messageBuffer[MESSAGE_BUFFER_LENGTH];
+
 
 // ******** Private methods ********
 
@@ -109,6 +112,7 @@ static void PrintError(const PCHAR functionName, const PCHAR apiName, const DWOR
    else
       fprintf(stderr, "Could not get error message (FormatMessage error code = %ld (0x%08lx)\n", le, le);
 }
+
 
 // ******** Public methods ********
 

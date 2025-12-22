@@ -33,10 +33,12 @@
 
 #include "BCryptList.h"
 
+
 // ******** Private constants ********
 
 #define RC_OK       0
 #define RC_PROC_ERR 1
+
 
 // ******** Main method ********
 

@@ -29,10 +29,12 @@
 #include <Windows.h>
 #include <stdio.h>
 
+
 // ******** Private constants ********
 
 /// Length of message buffers.
 #define MESSAGE_BUFFER_LENGTH 256
+
 
 // ******** Private variables ********
 
@@ -44,6 +46,7 @@ static char consoleBuffer[MESSAGE_BUFFER_LENGTH];
 
 /// Code page of the console.
 UINT consoleCodePage = 0;
+
 
 // ******** Public functions ********
 
