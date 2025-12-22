@@ -49,12 +49,6 @@
 #include "PrintModVersion.h"
 
 
-// ******** Private constants ********
-
-#define RC_OK  0
-#define RC_ERR 0xff
-
-
 // ******** Private methods ********
 
 /// <summary>
@@ -92,39 +86,43 @@ static void ShellSort(LPWSTR* const pAlgorithmNames, const USHORT algorithmCount
 static void PrintAlgorithmTypeName(const ULONG algorithmType, FILE* fStdOut) {
    _putc_nolock('\n', fStdOut);
 
+   char* algorithmTypeDescription = NULL;
+
    switch (algorithmType) {
    case BCRYPT_CIPHER_OPERATION:
-      fputs("Symmetric ciphers", fStdOut);
+      algorithmTypeDescription = "Symmetric ciphers";
       break;
 
    case BCRYPT_HASH_OPERATION:
-      fputs("Hashes", fStdOut);
+      algorithmTypeDescription = "Hashes";
       break;
 
    case BCRYPT_ASYMMETRIC_ENCRYPTION_OPERATION:
-      fputs("Asymmetric ciphers", fStdOut);
+      algorithmTypeDescription = "Asymmetric ciphers";
       break;
 
    case BCRYPT_SECRET_AGREEMENT_OPERATION:
-      fputs("Secret agreements", fStdOut);
+      algorithmTypeDescription = "Secret agreements";
       break;
 
    case BCRYPT_SIGNATURE_OPERATION:
-      fputs("Signatures", fStdOut);
+      algorithmTypeDescription = "Signatures";
       break;
 
    case BCRYPT_RNG_OPERATION:
-      fputs("Pseudorandom Number Generators", fStdOut);
+      algorithmTypeDescription = "Pseudorandom Number Generators";
       break;
 
    case BCRYPT_KEY_DERIVATION_OPERATION:
-      fputs("Key derivation", fStdOut);
+      algorithmTypeDescription = "Key derivation";
       break;
 
    default:
-      fprintf(stderr, "Unknown algorithm type 0x%lx", algorithmType);
+      fprintf(stderr, "Unknown algorithm type 0x%lx\n", algorithmType);
+      return;
    }
 
+   fputs(algorithmTypeDescription, fStdOut);
    fputs(":\n", fStdOut);
 }
 
@@ -218,7 +216,7 @@ static BOOL ListForType(const HANDLE hHeap, const ULONG algorithmType, FILE* fSt
 /// <summary>
 /// Print the names of all BCrypt algorithms.
 /// </summary>
-unsigned char ListAllTypes() {
+BOOL ListAllTypes() {
    const PCHAR functionName = "ListAllTypes";
 
    FILE* fStdOut = stdout;
@@ -234,7 +232,7 @@ unsigned char ListAllTypes() {
    HANDLE hHeap = GetProcessHeap();
    if (hHeap == NULL) {
       PrintLastError(functionName, "GetProcessHeap");
-      return RC_ERR;
+      return FALSE;
    }
 
    // 3. Print lists for each type.
@@ -246,8 +244,5 @@ unsigned char ListAllTypes() {
    result &= ListForType(hHeap, BCRYPT_RNG_OPERATION, fStdOut);
    result &= ListForType(hHeap, BCRYPT_KEY_DERIVATION_OPERATION, fStdOut);
 
-   if (result == FALSE)
-      return RC_ERR;
-
-   return RC_OK;
+   return result;
 }
