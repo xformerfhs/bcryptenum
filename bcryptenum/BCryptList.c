@@ -155,6 +155,7 @@ static LPWSTR* CopyAlgorithmNamePointers(const HANDLE hHeap, BCRYPT_ALGORITHM_ID
 /// <summary>
 /// Print the list of algorithm names for the specified type.
 /// </summary>
+/// <param name="hHeap">Handle of the local heap.</param>
 /// <param name="listType">BCrypt algorithm type.</param>
 /// <param name="fStdOut">Stdout file pointer.</param>
 static BOOL ListForType(const HANDLE hHeap, const ULONG algorithmType, FILE* fStdOut) {
