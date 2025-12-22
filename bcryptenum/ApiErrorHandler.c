@@ -20,11 +20,12 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.0.0
+// Version: 2.0.1
 //
 // Change history:
 //    2023-11-18: V1.0.0: Created.
 //    2025-11-12: V2.0.0: Print messages in console code page.
+//    2025-12-22: V2.0.1: Corrected casing of function names.
 //
 
 #include <Windows.h>
@@ -49,7 +50,7 @@ static WCHAR messageBuffer[MESSAGE_BUFFER_LENGTH];
 /// </summary>
 /// <param name="errorNumber">NTSTATUS to get the text for.</param>
 /// <returns>Length of message text. A value of 0 indicates that no message could be found.</returns>
-static DWORD getNtStatusErrorMessage(const DWORD errorNumber) {
+static DWORD GetNtStatusErrorMessage(const DWORD errorNumber) {
    // For *all* NTSTATUS codes it is necessary to look them up in "ntdll.dll"!
    HMODULE ntdllModule = GetModuleHandleW(L"ntdll.dll");
    DWORD msgLen = FormatMessageW(FORMAT_MESSAGE_FROM_HMODULE | FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -67,7 +68,7 @@ static DWORD getNtStatusErrorMessage(const DWORD errorNumber) {
 /// </summary>
 /// <param name="errorNumber">Error code.</param>
 /// <returns>Length of message text. A value of 0 indicates that no message could be found.</returns>
-static DWORD getSystemErrorMessage(const DWORD errorNumber) {
+static DWORD GetSystemErrorMessage(const DWORD errorNumber) {
    DWORD msgLen = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                                  NULL,
                                  errorNumber,
@@ -85,12 +86,12 @@ static DWORD getSystemErrorMessage(const DWORD errorNumber) {
 /// <param name="apiName">Name of the failing Windows API function.</param>
 /// <param name="errorNumber">Error number.</param>
 /// <param name="isNtStatus">Is the error number an NTSTATUS.</param>
-static void printError(const PCHAR functionName, const PCHAR apiName, const DWORD errorNumber, const BOOL isNtStatus) {
+static void PrintError(const PCHAR functionName, const PCHAR apiName, const DWORD errorNumber, const BOOL isNtStatus) {
    DWORD msgLen;
    if (isNtStatus == FALSE)
-      msgLen = getSystemErrorMessage(errorNumber);
+      msgLen = GetSystemErrorMessage(errorNumber);
    else
-      msgLen = getNtStatusErrorMessage(errorNumber);
+      msgLen = GetNtStatusErrorMessage(errorNumber);
 
    DWORD le = 0;
    if (msgLen == 0)
@@ -118,7 +119,7 @@ static void printError(const PCHAR functionName, const PCHAR apiName, const DWOR
 /// <param name="apiName">Name of the failing Windows API function.</param>
 /// <param name="errorNumber">Error number.</param>
 void PrintWinError(const PCHAR functionName, const PCHAR apiName, const DWORD errorNumber) {
-   printError(functionName, apiName, errorNumber, FALSE);
+   PrintError(functionName, apiName, errorNumber, FALSE);
 }
 
 /// <summary>
@@ -137,5 +138,5 @@ void PrintLastError(const PCHAR functionName, const PCHAR apiName) {
 /// <param name="apiName">Name of the failing Windows API function.</param>
 /// <param name="errorStatus">NTSTATUS of failing function.</param>
 void PrintNtStatus(const PCHAR functionName, const PCHAR apiName, const NTSTATUS errorStatus) {
-   printError(functionName, apiName, (DWORD) errorStatus, TRUE);
+   PrintError(functionName, apiName, (DWORD) errorStatus, TRUE);
 }

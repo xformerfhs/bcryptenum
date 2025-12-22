@@ -20,12 +20,11 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.0.0
+// Version: 1.0.1
 //
 // Change history:
 //    2024-11-12: V1.0.0: Created.
 //    2024-11-13: V1.0.1: Small change.
-//    2025-11-12: V2.0.0: Print to console in console code page.
 //
 
 #define _CRT_DISABLE_PERFCRIT_LOCKS 1

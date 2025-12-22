@@ -20,13 +20,15 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.0.0
+// Version: 1.0.1
 //
 // Change history:
 //    2025-11-13: V1.0.0: Created.
+//    2025-12-22: V1.0.1: Corrected function naming.
 //
 
 #include <stdint.h>
+
 
 // ******** Private constants ********
 
@@ -36,22 +38,24 @@
 /// Size of the buffer for formatting numbers with thousands grouping separators.
 #define BUFFER_SIZE 20
 
+
 // ******** Private variables ********
 
 /// Buffer for formatting numbers with thousands grouping separators.
 char numberBuffer[BUFFER_SIZE];
 
+
 // ******** Private methods ********
 
 /// <summary>
-/// Fast division and modulo by 10 for unsigned long integers.
+/// Fast division and modulo by 10 for unsigned 16-bit integers.
 /// </summary>
 /// <param name="in">Number to divide.</param>
 /// <param name="pDivResult">Pointer to store the division result.</param>
 /// <param name="pModResult">Pointer to store the modulo result.</param>
-static inline void divmod10f32(uint16_t const in, uint16_t* const pDivResult, uint16_t* const pModResult) {
+static inline void FastDivMod10Uint16(uint16_t const in, uint16_t* const pDivResult, uint16_t* const pModResult) {
    uint16_t x = (in | 1) - (in >> 2);
-   uint16_t q = (x >> 4) + x;
+   uint16_t q = x + (x >> 4);  // x * 1.0625
 
    x = q;
    q = (q >> 8) + x;
@@ -61,6 +65,7 @@ static inline void divmod10f32(uint16_t const in, uint16_t* const pDivResult, ui
    *pDivResult = divResult;
    *pModResult = in - ((q & ~7) + (divResult << 1));
 }
+
 
 // ******** Public methods ********
 
@@ -84,7 +89,7 @@ char* FormatUint16WithSeparator(uint16_t const aNumber, char const separator) {
 
       uint16_t divResult;
       uint16_t modResult;
-      divmod10f32(last, &divResult, &modResult);
+      FastDivMod10Uint16(last, &divResult, &modResult);
 
       *pBuffer-- = (char)modResult + '0';
       groupCount++;
@@ -99,7 +104,7 @@ char* FormatUint16WithSeparator(uint16_t const aNumber, char const separator) {
 /// </summary>
 /// <param name="aNumber">Number to proint.</param>
 /// <returns>Pointer to string of number.</returns>
-char* FormatUint16NumberWithDefaultSeparator(uint16_t const aNumber) {
+char* FormatUint16NumberWithDefaultSeparator(const uint16_t aNumber) {
    return FormatUint16WithSeparator(aNumber, DEFAULT_SEPARATOR);
 }
 
@@ -108,7 +113,7 @@ char* FormatUint16NumberWithDefaultSeparator(uint16_t const aNumber) {
 /// </summary>
 /// <param name="aNumber">Number to proint.</param>
 /// <returns>Pointer to string of number.</returns>
-char* FormatUint16Number(uint16_t const aNumber) {
+char* FormatUint16Number(const uint16_t aNumber) {
    uint16_t last = aNumber;
    char* pBuffer = &numberBuffer[BUFFER_SIZE - 1];  // Start at the end of the buffer.
    *pBuffer-- = 0;  // Set terminating zero.
@@ -116,7 +121,7 @@ char* FormatUint16Number(uint16_t const aNumber) {
    do {
       uint16_t divResult;
       uint16_t modResult;
-      divmod10f32(last, &divResult, &modResult);
+      FastDivMod10Uint16(last, &divResult, &modResult);
 
       *pBuffer-- = (char)modResult + '0';
       last = divResult;
