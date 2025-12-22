@@ -82,7 +82,7 @@ static void ShellSort(LPWSTR* const pAlgorithmNames, const USHORT algorithmCount
 /// <summary>
 /// Print the type of the elements in the list.
 /// </summary>
-/// <param name="listType">BCrypt algorithm type.</param>
+/// <param name="algorithmType">BCrypt algorithm type.</param>
 /// <param name="fStdOut">Stdout file pointer.</param>
 static void PrintAlgorithmTypeName(const ULONG algorithmType, FILE* fStdOut) {
    _putc_nolock('\n', fStdOut);
@@ -156,7 +156,7 @@ static LPWSTR* CopyAlgorithmNamePointers(const HANDLE hHeap, BCRYPT_ALGORITHM_ID
 /// Print the list of algorithm names for the specified type.
 /// </summary>
 /// <param name="hHeap">Handle of the local heap.</param>
-/// <param name="listType">BCrypt algorithm type.</param>
+/// <param name="algorithmType">BCrypt algorithm type.</param>
 /// <param name="fStdOut">Stdout file pointer.</param>
 static BOOL ListForType(const HANDLE hHeap, const ULONG algorithmType, FILE* fStdOut) {
    const PCHAR functionName = "ListForType";
