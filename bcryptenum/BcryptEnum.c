@@ -28,16 +28,15 @@
 //    2025-10-22: V1.1.0: List all types.
 //    2025-10-23: V1.2.0: Simplified output of results.
 //    2025-11-12: V2.0.0: Output printed in console code page.
-//    2025-12-22: V2.0.1: Removed unnecessary includes.
+//    2025-12-22: V2.0.1: Removed unnecessary includes and defines.
 //
 
 #include "BCryptList.h"
 
 // ******** Private constants ********
 
-#define RC_OK 0
-#define RC_CMD_ERR 1
-#define RC_PROC_ERR 2
+#define RC_OK       0
+#define RC_PROC_ERR 1
 
 // ******** Main method ********
 
