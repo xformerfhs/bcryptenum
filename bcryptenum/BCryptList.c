@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.1.3
+// Version: 2.1.4
 //
 // Change history:
 //    2023-12-01: V1.0.0: Created.
@@ -36,6 +36,7 @@
 //    2025-12-22: V2.1.1: Corrected casing of function names.
 //    2025-12-22: V2.1.2: More compact list.
 //    2025-12-22: V2.1.3: Handle empty algorithm list.
+//    2025-12-22: V2.1.4: Simplified list processing.
 //
 
 #define _CRT_DISABLE_PERFCRIT_LOCKS 1
@@ -86,7 +87,7 @@ static void ShellSort(LPWSTR* const pAlgorithmNames, const USHORT algorithmCount
 static void PrintAlgorithmTypeName(const ULONG algorithmType, FILE* fStdOut) {
    _putc_nolock('\n', fStdOut);
 
-   char* algorithmTypeDescription = NULL;
+   char* algorithmTypeDescription;
 
    switch (algorithmType) {
    case BCRYPT_CIPHER_OPERATION:
