@@ -14,4 +14,4 @@ Feel free to submit a pull request with new features, improvements on tests or d
 Frank Schwab ([Mail](mailto:xformer.github@proton.me "Mail"))
 
 ## License
-Algoenum is released under the Apache V2 license. See "LICENSE" for details.
+Bcryptenum is released under the Apache V2 license. See "LICENSE" for details.
