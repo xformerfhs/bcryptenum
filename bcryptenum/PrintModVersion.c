@@ -27,6 +27,7 @@
 //    2024-11-13: V1.0.1: Small change.
 //
 
+// This is a single-threaded application. Disable CRT locks for better performance.
 #define _CRT_DISABLE_PERFCRIT_LOCKS 1
 
 #include <Windows.h>

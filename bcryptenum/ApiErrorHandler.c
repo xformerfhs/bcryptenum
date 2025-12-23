@@ -20,13 +20,17 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.0.1
+// Version: 2.0.2
 //
 // Change history:
 //    2023-11-18: V1.0.0: Created.
 //    2025-11-12: V2.0.0: Print messages in console code page.
 //    2025-12-22: V2.0.1: Corrected casing of function names.
+//    2025-12-23: V2.0.2: Disable CRT locks.
 //
+
+// This is a single-threaded application. Disable CRT locks for better performance.
+#define _CRT_DISABLE_PERFCRIT_LOCKS 1
 
 #include <Windows.h>
 #include <bcrypt.h>

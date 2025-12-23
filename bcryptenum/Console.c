@@ -20,11 +20,15 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.0.0
+// Version: 1.0.1
 //
 // Change history:
 //    2025-11-12: V1.0.0: Created.
+//    2025-12-23: V1.0.1: Disable CRT locks.
 //
+
+// This is a single-threaded application. Disable CRT locks for better performance.
+#define _CRT_DISABLE_PERFCRIT_LOCKS 1
 
 #include <Windows.h>
 #include <stdio.h>

@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.1.4
+// Version: 2.1.5
 //
 // Change history:
 //    2023-12-01: V1.0.0: Created.
@@ -37,12 +37,15 @@
 //    2025-12-22: V2.1.2: More compact list.
 //    2025-12-22: V2.1.3: Handle empty algorithm list.
 //    2025-12-22: V2.1.4: Simplified list processing.
+//    2025-12-23: V2.1.5: Corrected loop counter of list output.
 //
 
+// This is a single-threaded application. Disable CRT locks for better performance.
 #define _CRT_DISABLE_PERFCRIT_LOCKS 1
 
 #include <Windows.h>
 #include <bcrypt.h>
+
 #include <stdio.h>
 
 #include "ApiErrorHandler.h"
@@ -166,7 +169,7 @@ static BOOL ListForType(const HANDLE hHeap, const ULONG algorithmType, FILE* fSt
 
    // 2. Get the list of algorithms of this type.
    ULONG algoCount;
-   BCRYPT_ALGORITHM_IDENTIFIER* pAlgoList;
+   BCRYPT_ALGORITHM_IDENTIFIER* pAlgoList = NULL;
    NTSTATUS nts = BCryptEnumAlgorithms(algorithmType, &algoCount, &pAlgoList, 0);
    if (nts < 0) {
       PrintNtStatus(functionName, "BCryptEnumAlgorithms", nts);
@@ -176,14 +179,13 @@ static BOOL ListForType(const HANDLE hHeap, const ULONG algorithmType, FILE* fSt
    // 2.1 Check, if any algorithms were found.
    if (algoCount == 0) {
       fputs("   <no algorithms found>\n", fStdOut);
-      BCryptFreeBuffer(pAlgoList);
+		// It is not necessary to free pAlgoList, since it is NULL if no algorithms were found.
       return TRUE;
    }
 
    // 3. Sort the algorithm names.
 
-   // 3.1 Copy the pointers to the names into a local memory area.
-   //     This is necessary, so that this list can be sorted.
+   // 3.1 Copy the pointers to the names into a local memory area that can be sorted.
    
    // Pointer to list of string pointers to algorithm names.
    LPWSTR* pSortedList = CopyAlgorithmNamePointers(hHeap, pAlgoList, algoCount);
@@ -199,7 +201,7 @@ static BOOL ListForType(const HANDLE hHeap, const ULONG algorithmType, FILE* fSt
 
    // Pointer to algorithm identifier.
    LPWSTR* pActAlgoName = pSortedList;
-   for (ULONG i = algoCount; i > 0; i--) {
+   for (ULONG i = 0; i < algoCount; i++) {
       fputs("   ", fStdOut);
       fputs(AsConsoleCodePageString(*pActAlgoName++), fStdOut);
       _putc_nolock('\n', fStdOut);
