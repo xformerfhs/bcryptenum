@@ -231,8 +231,6 @@ BOOL ListAllTypes() {
    fputs(" algorithms by type:\n", fStdOut);
    
    // 2. Get the process heap to use in the list functions.
-   
-   // Process heap.
    HANDLE hHeap = GetProcessHeap();
    if (hHeap == NULL) {
       PrintLastError(functionName, "GetProcessHeap");
