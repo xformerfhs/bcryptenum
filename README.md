@@ -9,6 +9,9 @@ E.g. the [SHA-3](https://en.wikipedia.org/wiki/SHA-3) hash functions are support
 
 Since [.NET](https://dotnet.microsoft.com/en-us/) – for some reason that completely eludes me – uses the cryptographic functions of the platform OS the list of supported algorithms is relevant for .NET, as well.
 
+This program does not use the C runtime.
+Only bcrypt.dll, kernel32.dll and version.dll are needed.
+
 ## Contributing
 Feel free to submit a pull request with new features, improvements on tests or documentation and bug fixes.
 
