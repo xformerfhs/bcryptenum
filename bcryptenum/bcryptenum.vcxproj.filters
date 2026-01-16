@@ -27,10 +27,22 @@
     <ClCompile Include="PrintModVersion.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Console.c">
+    <ClCompile Include="NumberFormatter.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NumberFormatter.c">
+    <ClCompile Include="Codepage.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Printing.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Strings.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Startup.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -44,10 +56,19 @@
     <ClInclude Include="PrintModVersion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Console.h">
+    <ClInclude Include="NumberFormatter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NumberFormatter.h">
+    <ClInclude Include="Codepage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Printing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Strings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

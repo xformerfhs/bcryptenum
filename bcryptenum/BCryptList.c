@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.1.5
+// Version: 2.2.0
 //
 // Change history:
 //    2023-12-01: V1.0.0: Created.
@@ -38,20 +38,16 @@
 //    2025-12-22: V2.1.3: Handle empty algorithm list.
 //    2025-12-22: V2.1.4: Simplified list processing.
 //    2025-12-23: V2.1.5: Corrected loop counter of list output.
+//    2026-01-16: V2.2.0: Use own printing subsystem.
 //
-
-// This is a single-threaded application. Disable CRT locks for better performance.
-#define _CRT_DISABLE_PERFCRIT_LOCKS 1
 
 #include <Windows.h>
 #include <bcrypt.h>
 
-#include <stdio.h>
-
 #include "ApiErrorHandler.h"
-#include "Console.h"
+#include "Printing.h"
 #include "PrintModVersion.h"
-
+#include "Strings.h"
 
 // ******** Private methods ********
 
@@ -71,7 +67,7 @@ static void ShellSort(LPWSTR* const pAlgorithmNames, const USHORT algorithmCount
          USHORT insertionIndex = i;
          
          while (insertionIndex >= step &&
-                wcscmp(insertionName, pAlgorithmNames[insertionIndex - step]) < 0) {
+                WcharStringCompare(insertionName, pAlgorithmNames[insertionIndex - step]) < 0) {
             pAlgorithmNames[insertionIndex] = pAlgorithmNames[insertionIndex - step];
             insertionIndex -= step;
          }
@@ -86,9 +82,8 @@ static void ShellSort(LPWSTR* const pAlgorithmNames, const USHORT algorithmCount
 /// Print the type of the elements in the list.
 /// </summary>
 /// <param name="algorithmType">BCrypt algorithm type.</param>
-/// <param name="fStdOut">Stdout file pointer.</param>
-static void PrintAlgorithmTypeName(const ULONG algorithmType, FILE* fStdOut) {
-   _putc_nolock('\n', fStdOut);
+static void PrintAlgorithmTypeName(const ULONG algorithmType) {
+	PrintByteStdOut('\n');
 
    char* algorithmTypeDescription;
 
@@ -122,12 +117,14 @@ static void PrintAlgorithmTypeName(const ULONG algorithmType, FILE* fStdOut) {
       break;
 
    default:
-      fprintf(stderr, "Unknown algorithm type 0x%lx\n", algorithmType);
+		PrintByteBufferStdErr("Unknown algorithm type 0x", 25);
+		PrintLowerHexStdErr(algorithmType, 2);
+		PrintByteStdErr('\n');
       return;
    }
 
-   fputs(algorithmTypeDescription, fStdOut);
-   fputs(":\n", fStdOut);
+   PrintByteStringStdOut(algorithmTypeDescription);
+   PrintByteBufferStdOut(":\n", 2);
 }
 
 /// <summary>
@@ -137,12 +134,14 @@ static void PrintAlgorithmTypeName(const ULONG algorithmType, FILE* fStdOut) {
 /// <param name="pAlgoList">Pointer to the list of BCrypt algorithm identifiers.</param>
 /// <param name="algoCount">Number of algorithms.</param>
 /// <returns>Pointer to the local copy of the algorithm name pointers.</returns>
-static LPWSTR* CopyAlgorithmNamePointers(const HANDLE hHeap, BCRYPT_ALGORITHM_IDENTIFIER* const pAlgoList, const ULONG algoCount) {
-   const PCHAR functionName = "CopyAlgorithmNames";
-
+static LPWSTR* CopyAlgorithmNamePointers(
+   const HANDLE hHeap, 
+   BCRYPT_ALGORITHM_IDENTIFIER* const pAlgoList,
+   const ULONG algoCount
+) {
    LPWSTR* pNameList = HeapAlloc(hHeap, 0, algoCount * sizeof(LPWSTR));
    if (pNameList == NULL) {
-      fprintf(stderr, "Function \"%s\": HeapAlloc for algorithm name list failed.\n", functionName);
+      PrintByteBufferStdErr("CopyAlgorithmNamePointers:HeapAlloc for algorithm name list failed.\n", 68);
       return pNameList;
    }
 
@@ -160,12 +159,11 @@ static LPWSTR* CopyAlgorithmNamePointers(const HANDLE hHeap, BCRYPT_ALGORITHM_ID
 /// </summary>
 /// <param name="hHeap">Handle of the local heap.</param>
 /// <param name="algorithmType">BCrypt algorithm type.</param>
-/// <param name="fStdOut">Stdout file pointer.</param>
-static BOOL ListForType(const HANDLE hHeap, const ULONG algorithmType, FILE* fStdOut) {
+static BOOL ListForType(const HANDLE hHeap, const ULONG algorithmType) {
    const PCHAR functionName = "ListForType";
 
    // 1. Print the algorithm type.
-   PrintAlgorithmTypeName(algorithmType, fStdOut);
+   PrintAlgorithmTypeName(algorithmType);
 
    // 2. Get the list of algorithms of this type.
    ULONG algoCount;
@@ -178,7 +176,7 @@ static BOOL ListForType(const HANDLE hHeap, const ULONG algorithmType, FILE* fSt
 
    // 2.1 Check, if any algorithms were found.
    if (algoCount == 0) {
-      fputs("   <no algorithms found>\n", fStdOut);
+		PrintByteBufferStdOut("   <no algorithms found>\n", 25);
 		// It is not necessary to free pAlgoList, since it is NULL if no algorithms were found.
       return TRUE;
    }
@@ -202,9 +200,9 @@ static BOOL ListForType(const HANDLE hHeap, const ULONG algorithmType, FILE* fSt
    // Pointer to algorithm identifier.
    LPWSTR* pActAlgoName = pSortedList;
    for (ULONG i = 0; i < algoCount; i++) {
-      fputs("   ", fStdOut);
-      fputs(AsConsoleCodePageString(*pActAlgoName++), fStdOut);
-      _putc_nolock('\n', fStdOut);
+		PrintByteBufferStdOut("   ", 3);
+      PrintWcharStringStdOut(*pActAlgoName++);
+      PrintByteStdOut('\n');
    }
 
    // 5. Release memory.
@@ -223,12 +221,10 @@ static BOOL ListForType(const HANDLE hHeap, const ULONG algorithmType, FILE* fSt
 BOOL ListAllTypes() {
    const PCHAR functionName = "ListAllTypes";
 
-   FILE* fStdOut = stdout;
-
    // 1. Print header.
-   fputs("\nList of Bcrypt ", fStdOut);
-   PrintModuleVersion("bcrypt.dll", fStdOut);
-   fputs(" algorithms by type:\n", fStdOut);
+   PrintByteBufferStdOut("\nList of Bcrypt ", 16);
+   PrintModuleVersion("bcrypt.dll");
+   PrintByteBufferStdOut(" algorithms by type:\n", 21);
    
    // 2. Get the process heap to use in the list functions.
    HANDLE hHeap = GetProcessHeap();
@@ -238,13 +234,13 @@ BOOL ListAllTypes() {
    }
 
    // 3. Print lists for each type.
-   BOOL result = ListForType(hHeap, BCRYPT_CIPHER_OPERATION, fStdOut);
-   result &= ListForType(hHeap, BCRYPT_ASYMMETRIC_ENCRYPTION_OPERATION, fStdOut);
-   result &= ListForType(hHeap, BCRYPT_HASH_OPERATION, fStdOut);
-   result &= ListForType(hHeap, BCRYPT_SECRET_AGREEMENT_OPERATION, fStdOut);
-   result &= ListForType(hHeap, BCRYPT_SIGNATURE_OPERATION, fStdOut);
-   result &= ListForType(hHeap, BCRYPT_RNG_OPERATION, fStdOut);
-   result &= ListForType(hHeap, BCRYPT_KEY_DERIVATION_OPERATION, fStdOut);
+   BOOL result = ListForType(hHeap, BCRYPT_CIPHER_OPERATION);
+   result &= ListForType(hHeap, BCRYPT_ASYMMETRIC_ENCRYPTION_OPERATION);
+   result &= ListForType(hHeap, BCRYPT_HASH_OPERATION);
+   result &= ListForType(hHeap, BCRYPT_SECRET_AGREEMENT_OPERATION);
+   result &= ListForType(hHeap, BCRYPT_SIGNATURE_OPERATION);
+   result &= ListForType(hHeap, BCRYPT_RNG_OPERATION);
+   result &= ListForType(hHeap, BCRYPT_KEY_DERIVATION_OPERATION);
 
    return result;
 }

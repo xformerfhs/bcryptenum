@@ -20,21 +20,18 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.0.1
+// Version: 1.1.0
 //
 // Change history:
 //    2024-11-12: V1.0.0: Created.
 //    2024-11-13: V1.0.1: Small change.
+//    2026-01-16: V1.0.0: Use own printing subystem.
 //
 
-// This is a single-threaded application. Disable CRT locks for better performance.
-#define _CRT_DISABLE_PERFCRIT_LOCKS 1
-
 #include <Windows.h>
-#include <stdio.h>
 
 #include "ApiErrorHandler.h"
-#include "NumberFormatter.h"
+#include "Printing.h"
 
 
 // ******** Private data ********
@@ -49,8 +46,7 @@ CHAR fileName[MAX_PATH];
 /// Print the version of the supplied module file.
 /// </summary>
 /// <param name="moduleName">Name of the module.</param>
-/// <param name="fStdOut">Stdout file pointer.</param>
-void PrintModuleVersion(const PCHAR moduleName, FILE* fStdOut) {
+void PrintModuleVersion(const PCHAR moduleName) {
    // Name of this function for error messages.
    const PCHAR functionName = "PrintModuleVersion";
 
@@ -121,12 +117,12 @@ void PrintModuleVersion(const PCHAR moduleName, FILE* fStdOut) {
    // Hooray! Done! We can print the version information.
    // But wait... The version is hidden in DWORDs which we have to untangle ourselves.
    // This is so bizarre...
-   _fputc_nolock('V', fStdOut);
-   fputs(FormatUint16Number((pfi->dwProductVersionMS >> 16) & 0xffff), fStdOut);
-   _fputc_nolock('.', fStdOut);
-   fputs(FormatUint16Number(pfi->dwProductVersionMS & 0xffff), fStdOut);
-   _fputc_nolock('.', fStdOut);
-   fputs(FormatUint16Number((pfi->dwProductVersionLS >> 16) & 0xffff), fStdOut);
-   _fputc_nolock('.', fStdOut);
-   fputs(FormatUint16Number(pfi->dwProductVersionLS & 0xffff), fStdOut);
+   PrintByteStdOut('V');
+	PrintUint32StdOut((pfi->dwProductVersionMS >> 16) & 0xffff);
+   PrintByteStdOut('.');
+   PrintUint32StdOut(pfi->dwProductVersionMS & 0xffff);
+   PrintByteStdOut('.');
+   PrintUint32StdOut((pfi->dwProductVersionLS >> 16) & 0xffff);
+   PrintByteStdOut('.');
+   PrintUint32StdOut(pfi->dwProductVersionLS & 0xffff);
 }

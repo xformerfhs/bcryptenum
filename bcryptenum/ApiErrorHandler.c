@@ -20,28 +20,24 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.0.2
+// Version: 3.0.0
 //
 // Change history:
 //    2023-11-18: V1.0.0: Created.
 //    2025-11-12: V2.0.0: Print messages in console code page.
 //    2025-12-22: V2.0.1: Corrected casing of function names.
 //    2025-12-23: V2.0.2: Disable CRT locks.
+//    2026-01-16: V3.0.0: Use own printing subsystem.
 //
-
-// This is a single-threaded application. Disable CRT locks for better performance.
-#define _CRT_DISABLE_PERFCRIT_LOCKS 1
 
 #include <Windows.h>
 #include <bcrypt.h>
-#include <stdio.h>
 
-#include "Console.h"
-
+#include "Printing.h"
 
 // ******** Private constants ********
 
-#define MESSAGE_BUFFER_LENGTH 256
+#define MESSAGE_BUFFER_LENGTH 512
 
 
 // ******** Private variables ********
@@ -104,17 +100,24 @@ static void PrintError(const PCHAR functionName, const PCHAR apiName, const DWOR
    if (msgLen == 0)
       le = GetLastError();
 
-   fprintf(stderr,
-           "Function \"%s\", API function \"%s\" failed with error %lu (0x%08lx): ",
-           functionName,
-           apiName,
-           errorNumber,
-           errorNumber);
+   PrintByteStringStdErr(functionName);
+   PrintByteStdErr(':');
+   PrintByteStringStdErr(apiName);
+	PrintByteBufferStdErr(" failed with error ", 19);
+	PrintUint32StdErr(errorNumber);
+	PrintByteBufferStdErr(" (0x", 4);
+	PrintUpperHexStdErr(errorNumber, 8);
+   PrintByteBufferStdErr("): ", 3);
 
    if (msgLen > 0)
-      fputs(AsConsoleCodePageString(messageBuffer), stderr);
-   else
-      fprintf(stderr, "Could not get error message (FormatMessage error code = %ld (0x%08lx)\n", le, le);
+      PrintWcharStringStdErr(messageBuffer);
+   else {
+      PrintByteBufferStdErr("Could not get error message. FormatMessage error code = ", 56);
+      PrintUint32StdErr(le);
+      PrintByteBufferStdErr(" (0x", 4);
+      PrintUpperHexStdErr(le, 8);
+      PrintByteBufferStdErr(")\n", 2);
+   }
 }
 
 

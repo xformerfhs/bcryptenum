@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.0.1
+// Version: 3.0.0
 //
 // Change history:
 //    2024-06-01: V1.0.0: Created.
@@ -29,6 +29,7 @@
 //    2025-10-23: V1.2.0: Simplified output of results.
 //    2025-11-12: V2.0.0: Output printed in console code page.
 //    2025-12-22: V2.0.1: Removed unnecessary includes and defines.
+//    2026-01-16: V3.0.0: Removed C runtime.
 //
 
 #include "BCryptList.h"
@@ -42,7 +43,7 @@
 
 // ******** Main method ********
 
-int __cdecl main(int const argc, char const* argv[]) {
+int __cdecl main() {
    if (ListAllTypes() != FALSE)
       return RC_OK;
    else
