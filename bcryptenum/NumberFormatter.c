@@ -55,26 +55,26 @@ char numberBuffer[BUFFER_SIZE];
 /// <param name="separator">Thousands group separator character.</param>
 /// <returns>Pointer to string of number.</returns>
 char* FormatUint16WithSeparator(uint16_t const aNumber, char const separator) {
-   uint16_t last = aNumber;
-   char* pBuffer = &numberBuffer[BUFFER_SIZE - 1];  // Start at the end of the buffer.
-   *pBuffer-- = 0;  // Set terminating zero.
+	uint16_t last = aNumber;
+	char* pBuffer = &numberBuffer[BUFFER_SIZE - 1];  // Start at the end of the buffer.
+	*pBuffer-- = 0;  // Set terminating zero.
 
-   uint8_t groupCount = 0;
-   do {
-      if (groupCount >= 3) {
-         *pBuffer-- = separator;
-         groupCount = 0;
-      }
+	uint8_t groupCount = 0;
+	do {
+		if (groupCount >= 3) {
+			*pBuffer-- = separator;
+			groupCount = 0;
+		}
 
-      uint16_t div10 = last / 10;
-      uint16_t mod10 = last % 10;
+		uint16_t div10 = last / 10;
+		uint16_t mod10 = last % 10;
 
-      *pBuffer-- = (char)mod10 + '0';
-      groupCount++;
-      last = div10;
-   } while (last != 0);
+		*pBuffer-- = (char)mod10 + '0';
+		groupCount++;
+		last = div10;
+	} while (last != 0);
 
-   return ++pBuffer;
+	return ++pBuffer;
 }
 
 /// <summary>
@@ -83,7 +83,7 @@ char* FormatUint16WithSeparator(uint16_t const aNumber, char const separator) {
 /// <param name="aNumber">Number to proint.</param>
 /// <returns>Pointer to string of number.</returns>
 char* FormatUint16NumberWithDefaultSeparator(const uint16_t aNumber) {
-   return FormatUint16WithSeparator(aNumber, DEFAULT_SEPARATOR);
+	return FormatUint16WithSeparator(aNumber, DEFAULT_SEPARATOR);
 }
 
 /// <summary>
@@ -92,17 +92,17 @@ char* FormatUint16NumberWithDefaultSeparator(const uint16_t aNumber) {
 /// <param name="aNumber">Number to proint.</param>
 /// <returns>Pointer to string of number.</returns>
 char* FormatUint16Number(const uint16_t aNumber) {
-   uint16_t last = aNumber;
-   char* pBuffer = &numberBuffer[BUFFER_SIZE - 1];  // Start at the end of the buffer.
-   *pBuffer-- = 0;  // Set terminating zero.
+	uint16_t last = aNumber;
+	char* pBuffer = &numberBuffer[BUFFER_SIZE - 1];  // Start at the end of the buffer.
+	*pBuffer-- = 0;  // Set terminating zero.
 
-   do {
-       uint16_t div10 = last / 10;
-       uint16_t mod10 = last % 10;
+	do {
+		 uint16_t div10 = last / 10;
+		 uint16_t mod10 = last % 10;
 
-      *pBuffer-- = (char)mod10 + '0';
-      last = div10;
-   } while (last != 0);
+		*pBuffer-- = (char)mod10 + '0';
+		last = div10;
+	} while (last != 0);
 
-   return ++pBuffer;
+	return ++pBuffer;
 }

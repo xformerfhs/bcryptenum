@@ -11,8 +11,8 @@
 /// <param name="wcharBuffer">Buffer of wchars to write.</param>
 /// <param name="count">Count of wchar characters in the wchar buffer.</param>
 void WriteWithCodepage(
-   const HANDLE hOut,
-   const UINT codepage,
-   const wchar_t* wcharBuffer,
-   const uint32_t count
+	const HANDLE hOut,
+	const UINT codepage,
+	const wchar_t* wcharBuffer,
+	const uint32_t count
 );

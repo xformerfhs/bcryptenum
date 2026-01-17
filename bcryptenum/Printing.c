@@ -138,8 +138,8 @@ static void PrintUint32(const HANDLE hOutput, const UINT codePage, uint32_t numb
 /// </summary>
 void InitializePrinting() {
 	// 1. Get file handles to standard output and standard error.
-   hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-   hStdErr = GetStdHandle(STD_ERROR_HANDLE);
+	hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	hStdErr = GetStdHandle(STD_ERROR_HANDLE);
 
 	// 2. Get code pages for standard output and standard error.
 	UINT consoleCodepage = GetConsoleOutputCP();

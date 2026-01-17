@@ -38,12 +38,12 @@
 /// <param name="str">String.</param>
 /// <returns>Length of string.</returns>
 uint32_t ByteStringLength(const uint8_t* const str) {
-   const uint8_t* p = str;
+	const uint8_t* p = str;
 
-   while (*p)
-      p++;
+	while (*p)
+		p++;
 
-   return (uint32_t)(p - str);
+	return (uint32_t)(p - str);
 }
 
 /// <summary>
@@ -52,12 +52,12 @@ uint32_t ByteStringLength(const uint8_t* const str) {
 /// <param name="str">String.</param>
 /// <returns>Length of string.</returns>
 uint32_t WcharStringLength(const wchar_t* const str) {
-   const wchar_t* p = str;
+	const wchar_t* p = str;
 
-   while (*p)
-      p++;
+	while (*p)
+		p++;
 
-   return (uint32_t)(p - str);
+	return (uint32_t)(p - str);
 }
 
 /// <summary>
@@ -67,10 +67,10 @@ uint32_t WcharStringLength(const wchar_t* const str) {
 /// <param name="b">Second string.</param>
 /// <returns>< 0, if a < b; 0, if a == b; > 0, if a > b.</returns>
 int WcharStringCompare(const wchar_t* a, const wchar_t* b) {
-   while (*a && (*a == *b)) {
-      a++;
-      b++;
-   }
+	while (*a && (*a == *b)) {
+		a++;
+		b++;
+	}
 
-   return (int)(*a - *b);
+	return (int)(*a - *b);
 }

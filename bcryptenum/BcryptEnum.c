@@ -44,8 +44,8 @@
 // ******** Main method ********
 
 int __cdecl main() {
-   if (ListAllTypes() != FALSE)
-      return RC_OK;
-   else
-      return RC_PROC_ERR;
+	if (ListAllTypes() != FALSE)
+		return RC_OK;
+	else
+		return RC_PROC_ERR;
 }

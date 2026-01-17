@@ -70,47 +70,47 @@ static uint8_t byteBuffer[BYTE_BUFFER_SIZE];
 /// <param name="wcharBuffer">Buffer of wchars to write.</param>
 /// <param name="count">Count of wchar characters in the wchar buffer.</param>
 void WriteWithCodepage(
-   const HANDLE hOut,
-   const UINT codepage,
-   const wchar_t* wcharBuffer,
-   const uint32_t count
+	const HANDLE hOut,
+	const UINT codepage,
+	const wchar_t* wcharBuffer,
+	const uint32_t count
 ) {
 	// This works by using a pointer into the wchar buffer and converting chunks of wchars.
-    const wchar_t* p = wcharBuffer;
+	 const wchar_t* p = wcharBuffer;
 	uint32_t remaining = count;
 
-   while (remaining > 0) {
+	while (remaining > 0) {
 	  // 1. Write at most MAX_WCHAR_CHUNK_COUNT wchars at a time.
-      uint32_t chunkCount = remaining;
-      if (chunkCount > MAX_WCHAR_CHUNK_COUNT)
-         chunkCount = MAX_WCHAR_CHUNK_COUNT;
+		uint32_t chunkCount = remaining;
+		if (chunkCount > MAX_WCHAR_CHUNK_COUNT)
+			chunkCount = MAX_WCHAR_CHUNK_COUNT;
 
 	  // 2. Ensure we do not split a surrogate pair.
-      if (chunkCount > 1 && IS_HIGH_SURROGATE(p[chunkCount - 1]))
-         chunkCount--;
+		if (chunkCount > 1 && IS_HIGH_SURROGATE(p[chunkCount - 1]))
+			chunkCount--;
 
 	  // 3. Convert the chunk to the target codepage.
-      int byteLen = WideCharToMultiByte(
-         codepage,
-		 0,  // Substitute characters not present in the target codepage, no error on invalid chars, no composite checks.
-         p,
-         chunkCount,
-         byteBuffer,
-         sizeof(byteBuffer),
-         NULL,
-         NULL
-      );
+		int byteLen = WideCharToMultiByte(
+			codepage,
+			0,  // Substitute characters not present in the target codepage, no error on invalid chars, no composite checks.
+			p,
+			chunkCount,
+			byteBuffer,
+			sizeof(byteBuffer),
+			NULL,
+			NULL
+		);
 
 	  // 4. If that did not work, stop.
-      if (byteLen <= 0)
-         break;
+		if (byteLen <= 0)
+			break;
 
 	  // 5. Write the converted bytes to the output.
-      if (!WriteFile(hOut, byteBuffer, (DWORD)byteLen, NULL, NULL))
-         break;
+		if (!WriteFile(hOut, byteBuffer, (DWORD)byteLen, NULL, NULL))
+			break;
 
 	  // 6. Advance the pointer and decrease the count.
-      p += chunkCount;
-      remaining -= chunkCount;
-   }
+		p += chunkCount;
+		remaining -= chunkCount;
+	}
 }

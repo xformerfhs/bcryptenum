@@ -54,16 +54,16 @@ static WCHAR messageBuffer[MESSAGE_BUFFER_LENGTH];
 /// <param name="errorNumber">NTSTATUS to get the text for.</param>
 /// <returns>Length of message text. A value of 0 indicates that no message could be found.</returns>
 static DWORD GetNtStatusErrorMessage(const DWORD errorNumber) {
-   // For *all* NTSTATUS codes it is necessary to look them up in "ntdll.dll"!
-   HMODULE ntdllModule = GetModuleHandleW(L"ntdll.dll");
-   DWORD msgLen = FormatMessageW(FORMAT_MESSAGE_FROM_HMODULE | FORMAT_MESSAGE_IGNORE_INSERTS,
-                                 ntdllModule,
-                                 errorNumber,
-                                 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-                                 messageBuffer,
-                                 MESSAGE_BUFFER_LENGTH,
-                                 NULL);
-   return msgLen;
+	// For *all* NTSTATUS codes it is necessary to look them up in "ntdll.dll"!
+	HMODULE ntdllModule = GetModuleHandleW(L"ntdll.dll");
+	DWORD msgLen = FormatMessageW(FORMAT_MESSAGE_FROM_HMODULE | FORMAT_MESSAGE_IGNORE_INSERTS,
+											ntdllModule,
+											errorNumber,
+											MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
+											messageBuffer,
+											MESSAGE_BUFFER_LENGTH,
+											NULL);
+	return msgLen;
 }
 
 /// <summary>
@@ -72,14 +72,14 @@ static DWORD GetNtStatusErrorMessage(const DWORD errorNumber) {
 /// <param name="errorNumber">Error code.</param>
 /// <returns>Length of message text. A value of 0 indicates that no message could be found.</returns>
 static DWORD GetSystemErrorMessage(const DWORD errorNumber) {
-   DWORD msgLen = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                                 NULL,
-                                 errorNumber,
-                                 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-                                 messageBuffer,
-                                 MESSAGE_BUFFER_LENGTH,
-                                 NULL);
-   return msgLen;
+	DWORD msgLen = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+											NULL,
+											errorNumber,
+											MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
+											messageBuffer,
+											MESSAGE_BUFFER_LENGTH,
+											NULL);
+	return msgLen;
 }
 
 /// <summary>
@@ -90,34 +90,34 @@ static DWORD GetSystemErrorMessage(const DWORD errorNumber) {
 /// <param name="errorNumber">Error number.</param>
 /// <param name="isNtStatus">Is the error number an NTSTATUS.</param>
 static void PrintError(const PCHAR functionName, const PCHAR apiName, const DWORD errorNumber, const BOOL isNtStatus) {
-   DWORD msgLen;
-   if (isNtStatus == FALSE)
-      msgLen = GetSystemErrorMessage(errorNumber);
-   else
-      msgLen = GetNtStatusErrorMessage(errorNumber);
+	DWORD msgLen;
+	if (isNtStatus == FALSE)
+		msgLen = GetSystemErrorMessage(errorNumber);
+	else
+		msgLen = GetNtStatusErrorMessage(errorNumber);
 
-   DWORD le = 0;
-   if (msgLen == 0)
-      le = GetLastError();
+	DWORD le = 0;
+	if (msgLen == 0)
+		le = GetLastError();
 
-   PrintByteStringStdErr(functionName);
-   PrintByteStdErr(':');
-   PrintByteStringStdErr(apiName);
+	PrintByteStringStdErr(functionName);
+	PrintByteStdErr(':');
+	PrintByteStringStdErr(apiName);
 	PrintByteBufferStdErr(" failed with error ", 19);
 	PrintUint32StdErr(errorNumber);
 	PrintByteBufferStdErr(" (0x", 4);
 	PrintUpperHexStdErr(errorNumber, 8);
-   PrintByteBufferStdErr("): ", 3);
+	PrintByteBufferStdErr("): ", 3);
 
-   if (msgLen > 0)
-      PrintWcharStringStdErr(messageBuffer);
-   else {
-      PrintByteBufferStdErr("Could not get error message. FormatMessage error code = ", 56);
-      PrintUint32StdErr(le);
-      PrintByteBufferStdErr(" (0x", 4);
-      PrintUpperHexStdErr(le, 8);
-      PrintByteBufferStdErr(")\n", 2);
-   }
+	if (msgLen > 0)
+		PrintWcharStringStdErr(messageBuffer);
+	else {
+		PrintByteBufferStdErr("Could not get error message. FormatMessage error code = ", 56);
+		PrintUint32StdErr(le);
+		PrintByteBufferStdErr(" (0x", 4);
+		PrintUpperHexStdErr(le, 8);
+		PrintByteBufferStdErr(")\n", 2);
+	}
 }
 
 
@@ -130,7 +130,7 @@ static void PrintError(const PCHAR functionName, const PCHAR apiName, const DWOR
 /// <param name="apiName">Name of the failing Windows API function.</param>
 /// <param name="errorNumber">Error number.</param>
 void PrintWinError(const PCHAR functionName, const PCHAR apiName, const DWORD errorNumber) {
-   PrintError(functionName, apiName, errorNumber, FALSE);
+	PrintError(functionName, apiName, errorNumber, FALSE);
 }
 
 /// <summary>
@@ -139,7 +139,7 @@ void PrintWinError(const PCHAR functionName, const PCHAR apiName, const DWORD er
 /// <param name="functionName">Name of the function calling the failing Windows API function.</param>
 /// <param name="apiName">Name of the failing Windows API function.</param>
 void PrintLastError(const PCHAR functionName, const PCHAR apiName) {
-   PrintWinError(functionName, apiName, GetLastError());
+	PrintWinError(functionName, apiName, GetLastError());
 }
 
 /// <summary>
@@ -149,5 +149,5 @@ void PrintLastError(const PCHAR functionName, const PCHAR apiName) {
 /// <param name="apiName">Name of the failing Windows API function.</param>
 /// <param name="errorStatus">NTSTATUS of failing function.</param>
 void PrintNtStatus(const PCHAR functionName, const PCHAR apiName, const NTSTATUS errorStatus) {
-   PrintError(functionName, apiName, (DWORD) errorStatus, TRUE);
+	PrintError(functionName, apiName, (DWORD) errorStatus, TRUE);
 }
