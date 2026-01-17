@@ -152,7 +152,6 @@
     <ClCompile Include="BCryptList.c" />
     <ClCompile Include="Codepage.c" />
     <ClCompile Include="Memory.c" />
-    <ClCompile Include="NumberFormatter.c" />
     <ClCompile Include="Printing.c" />
     <ClCompile Include="PrintModVersion.c" />
     <ClCompile Include="Startup.c" />
@@ -163,7 +162,6 @@
     <ClInclude Include="BCryptList.h" />
     <ClInclude Include="Codepage.h" />
     <ClInclude Include="Memory.h" />
-    <ClInclude Include="NumberFormatter.h" />
     <ClInclude Include="Printing.h" />
     <ClInclude Include="PrintModVersion.h" />
     <ClInclude Include="Strings.h" />

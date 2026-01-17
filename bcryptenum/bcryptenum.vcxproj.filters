@@ -27,9 +27,6 @@
     <ClCompile Include="PrintModVersion.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NumberFormatter.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Codepage.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -54,9 +51,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PrintModVersion.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NumberFormatter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Codepage.h">
