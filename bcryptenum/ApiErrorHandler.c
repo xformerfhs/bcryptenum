@@ -108,7 +108,7 @@ static DWORD GetNtStatusErrorMessage(const DWORD errorNumber) {
 			errorNumber,
 			ntdllModule,
 			FORMAT_MESSAGE_FROM_HMODULE,
-			0
+			0  // Tries 1. Language neutral, 2. Thread LANGID, 3. User default LANGID, 4. System default LANGID, 5. US English
 		);
 
 	return msgLen;
@@ -134,7 +134,7 @@ static DWORD GetSystemErrorMessage(const DWORD errorNumber) {
 			errorNumber,
 			NULL,
 			FORMAT_MESSAGE_FROM_SYSTEM,
-			0
+			0  // Tries 1. Language neutral, 2. Thread LANGID, 3. User default LANGID, 4. System default LANGID, 5. US English
 		);
 
 	return msgLen;
