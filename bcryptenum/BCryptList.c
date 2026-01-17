@@ -67,7 +67,7 @@ static void ShellSort(LPWSTR* const pAlgorithmNames, const USHORT algorithmCount
 			USHORT insertionIndex = i;
 			
 			while (insertionIndex >= step &&
-					 WcharStringCompare(insertionName, pAlgorithmNames[insertionIndex - step]) < 0) {
+					 CompareWcharStringsOrdinal(insertionName, pAlgorithmNames[insertionIndex - step]) < 0) {
 				pAlgorithmNames[insertionIndex] = pAlgorithmNames[insertionIndex - step];
 				insertionIndex -= step;
 			}

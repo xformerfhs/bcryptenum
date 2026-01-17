@@ -61,12 +61,13 @@ uint32_t WcharStringLength(const wchar_t* const str) {
 }
 
 /// <summary>
-/// Compare two null-terminated wide character strings.
+/// Compares the ordinal values of the characters of two null-terminated wide character strings.
+/// This is not a linguistic comparison.
 /// </summary>
 /// <param name="a">First string.</param>
 /// <param name="b">Second string.</param>
 /// <returns>< 0, if a < b; 0, if a == b; > 0, if a > b.</returns>
-int WcharStringCompare(const wchar_t* a, const wchar_t* b) {
+int CompareWcharStringsOrdinal(const wchar_t* a, const wchar_t* b) {
 	while (*a && (*a == *b)) {
 		a++;
 		b++;
