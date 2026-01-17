@@ -22,16 +22,14 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.1.0
+// Version: 2.2.0
 //
 // Change history:
 //    2026-01-14: V1.0.0: Created.
 //    2026-01-14: V2.0.0: Convert command line correctly to console code page.
 //    2026-01-15: V2.1.0: Use memory manager.
+//    2026-01-17: V2.2.0: Simplified.
 //
-
-#include <windows.h>
-#include <stdint.h>
 
 #include "Printing.h"
 #include "Strings.h"
@@ -46,14 +44,9 @@ int __cdecl main();
 /// This is the program entry point. It is jumped to from the OS loader, not called.
 /// </summary>
 void Startup() {
-	uint32_t rc = 0xff;
-
 	// 1. Initialize printing subsystem.
 	InitializePrinting();
 
-	// 2. Call main function.
-	rc = main();
-
-	// 3. Exit process with return code of main.
-	ExitProcess(rc);
+	// 2. Call main and exit process with its return code. The program does not use commandline arguments.
+	ExitProcess(main());
 }
