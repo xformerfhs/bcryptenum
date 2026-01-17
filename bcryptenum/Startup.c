@@ -54,6 +54,6 @@ void Startup() {
 	// 2. Call main function.
 	rc = main();
 
-	// 3. Exit process with return code of main, if allocation of command line memory failed.
+	// 3. Exit process with return code of main.
 	ExitProcess(rc);
 }
