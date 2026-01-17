@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 3.1.0
+// Version: 3.2.0
 //
 // Change history:
 //    2023-11-18: V1.0.0: Created.
@@ -30,6 +30,7 @@
 //    2026-01-16: V3.0.0: Use own printing subsystem.
 //    2026-01-17: V3.0.1: Get module handle for ntdll.dll only once.
 //    2026-01-17: V3.1.0: Use system allocated message buffer; Try US English messages first.
+//    2026-01-17: V3.2.0: Handle error from US English FormatMessage try correctly.
 //
 
 #include <Windows.h>
@@ -61,14 +62,14 @@ static HMODULE GetNtdllModuleHandle() {
 }
 
 /// <summary>
-/// Get the text of a message with various parameters.
+/// Get the text of a message for a specified language id.
 /// </summary>
 /// <param name="errorNumber">Error number to get the message for.</param>
 /// <param name="module">Module handle (NULL for system message).</param>
 /// <param name="flag">Where to get the message from.</param>
 /// <param name="langId">Language id of message (0 for any message source).</param>
 /// <returns>Message length (0, if an error occurred).</returns>
-static DWORD TryGetMessage(
+static DWORD TryGetMessageForLangId(
 	const DWORD errorNumber,
 	const LPCVOID module,
 	const DWORD flag,
@@ -86,58 +87,83 @@ static DWORD TryGetMessage(
 }
 
 /// <summary>
-/// Get the text for an NTSTATUS.
+/// Get the text of a message for US English or, if that fails, for any other language id.
 /// </summary>
-/// <param name="errorNumber">NTSTATUS to get the text for.</param>
-/// <returns>Length of message text. A value of 0 indicates that no message could be found.</returns>
-static DWORD GetNtStatusErrorMessage(const DWORD errorNumber) {
-	// The message texts for *all* NTSTATUS codes can only be found in "ntdll.dll"!
-	const HMODULE ntdllModule = GetNtdllModuleHandle();
-
+/// <param name="errorNumber">Error number to get the message for.</param>
+/// <param name="module">Module handle (NULL for system message).</param>
+/// <param name="flag">Where to get the message from.</param>
+/// <param name="langId">Language id of message (0 for any message source).</param>
+/// <param name="pLastError">Pointer to variable where to store the last error.</param>
+/// <returns>Message length (0, if an error occurred).</returns>
+static DWORD TryGetMessage(
+	const DWORD errorNumber,
+	const LPCVOID module,
+	const DWORD flag,
+	const DWORD langId,
+	DWORD* const pLastError
+) {
 	// First try to get the message in US English.
-	DWORD msgLen = TryGetMessage(
+
+	DWORD msgLen = TryGetMessageForLangId(
 		errorNumber,
-		ntdllModule,
-		FORMAT_MESSAGE_FROM_HMODULE,
+		module,
+		flag,
 		MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US)
 	);
 
-	// If that did not work use any possible language.
-	if (msgLen == 0)
-		msgLen = TryGetMessage(
-			errorNumber,
-			ntdllModule,
-			FORMAT_MESSAGE_FROM_HMODULE,
-			0  // Tries 1. Language neutral, 2. Thread LANGID, 3. User default LANGID, 4. System default LANGID, 5. US English
-		);
+	// If that did not work try any possible language.
+	if (msgLen == 0) {
+		DWORD lastError = GetLastError();
+		*pLastError = lastError;
+
+		if (lastError == ERROR_RESOURCE_LANG_NOT_FOUND) {
+			msgLen = TryGetMessageForLangId(
+				errorNumber,
+				module,
+				flag,
+				0  // Tries 1. Language neutral, 2. Thread LANGID, 3. User default LANGID, 4. System default LANGID, 5. US English
+			);
+
+			if (msgLen != 0)
+				*pLastError = 0;
+			else
+				*pLastError = GetLastError();
+		}
+	}
 
 	return msgLen;
+}
+
+/// <summary>
+/// Get the text for an NTSTATUS.
+/// </summary>
+/// <param name="errorNumber">NTSTATUS to get the text for.</param>
+/// <param name="pLastError">Pointer to variable where to store the last error.</param>
+/// <returns>Length of message text. A value of 0 indicates that no message could be found.</returns>
+static DWORD GetNtStatusErrorMessage(const DWORD errorNumber, DWORD* const pLastError) {
+	return TryGetMessage(
+		errorNumber,
+		GetNtdllModuleHandle(),  // The message texts for *all* NTSTATUS codes can only be found in "ntdll.dll"!
+		FORMAT_MESSAGE_FROM_HMODULE,
+		0,
+		pLastError
+	);
 }
 
 /// <summary>
 /// Get the text for a Windows error code (GetLastError).
 /// </summary>
 /// <param name="errorNumber">Error code.</param>
+/// <param name="pLastError">Pointer to variable where to store the last error.</param>
 /// <returns>Length of message text. A value of 0 indicates that no message could be found.</returns>
-static DWORD GetSystemErrorMessage(const DWORD errorNumber) {
-	// First try to get the message in US English.
-	DWORD msgLen = TryGetMessage(
+static DWORD GetSystemErrorMessage(const DWORD errorNumber, DWORD* const pLastError) {
+	return TryGetMessage(
 		errorNumber,
 		NULL,
 		FORMAT_MESSAGE_FROM_SYSTEM,
-		MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US)
+		0,
+		pLastError
 	);
-
-	// If that did not work use any possible language.
-	if (msgLen == 0)
-		msgLen = TryGetMessage(
-			errorNumber,
-			NULL,
-			FORMAT_MESSAGE_FROM_SYSTEM,
-			0  // Tries 1. Language neutral, 2. Thread LANGID, 3. User default LANGID, 4. System default LANGID, 5. US English
-		);
-
-	return msgLen;
 }
 
 /// <summary>
@@ -148,18 +174,15 @@ static DWORD GetSystemErrorMessage(const DWORD errorNumber) {
 /// <param name="errorNumber">Error number.</param>
 /// <param name="isNtStatus">Is the error number an NTSTATUS.</param>
 static void PrintError(const PCHAR functionName, const PCHAR apiName, const DWORD errorNumber, const BOOL isNtStatus) {
+	DWORD lastError = 0;
 	DWORD msgLen;
 	if (isNtStatus == FALSE)
-		msgLen = GetSystemErrorMessage(errorNumber);
+		msgLen = GetSystemErrorMessage(errorNumber, &lastError);
 	else
-		msgLen = GetNtStatusErrorMessage(errorNumber);
-
-	DWORD le = 0;
-	if (msgLen == 0)
-		le = GetLastError();
+		msgLen = GetNtStatusErrorMessage(errorNumber, &lastError);
 
 	PrintByteStringStdErr(functionName);
-	PrintByteStdErr('!');
+	PrintByteStdErr('/');
 	PrintByteStringStdErr(apiName);
 	PrintByteBufferStdErr(" failed with error ", 19);
 	PrintUint32StdErr(errorNumber);
@@ -172,9 +195,9 @@ static void PrintError(const PCHAR functionName, const PCHAR apiName, const DWOR
 		LocalFree(messageBufferPtr);
 	} else {
 		PrintByteBufferStdErr("Could not get error message. FormatMessage error code = ", 56);
-		PrintUint32StdErr(le);
+		PrintUint32StdErr(lastError);
 		PrintByteBufferStdErr(" (0x", 4);
-		PrintUpperHexStdErr(le, 8);
+		PrintUpperHexStdErr(lastError, 8);
 		PrintByteBufferStdErr(")\n", 2);
 	}
 }
