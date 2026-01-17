@@ -31,6 +31,8 @@
 //    2026-01-17: V2.2.0: Simplified.
 //
 
+#include <Windows.h>
+
 #include "Printing.h"
 #include "Strings.h"
 
