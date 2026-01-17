@@ -44,7 +44,7 @@
 int __cdecl main();
 
 /// <summary>
-/// This is the program entry point.
+/// This is the program entry point. It is jumped to from the OS loader, not called.
 /// </summary>
 void Startup() {
 	uint32_t rc = 0xff;
@@ -55,9 +55,6 @@ void Startup() {
 	// 2. Call main function.
 	rc = main();
 
-	// 3. Free allocated memory.
-	FreeBuffers();
-
-	// 4. Exit process with return code of main, if allocation of command line memory failed.
+	// 3. Exit process with return code of main, if allocation of command line memory failed.
 	ExitProcess(rc);
 }
