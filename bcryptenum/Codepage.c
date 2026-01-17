@@ -63,53 +63,6 @@ static uint8_t byteBuffer[BYTE_BUFFER_SIZE];
 // ******** Public functions ********
 
 /// <summary>
-/// Copy a wchar buffer to the given codepage in a newly allocated buffer.
-/// </summary>
-/// <param name="wcharBuffer">Source buffer.</param>
-/// <param name="count">Number of characters in the source buffer.</param>
-/// <param name="codepage">Result codepage.</param>
-/// <returns>Pointer to byte buffer, or NULL.</returns>
-uint8_t* CodepageCopy(
-   const wchar_t* wcharBuffer,
-   const uint32_t count,
-   const UINT codepage
-   ) {
-	if (count == 0)
-      return NULL;
-
-   //
-	// The correct way to do this is to scan the wchar buffer once to get the required byte length,
-	// then to allocate the buffer with this length and then scan it again to do the actual conversion.
-   // This way we have to do two function calls and the buffer is always scanned twice, which is CPU intensive.
-   // 
-	// So, here we do it in a less CPU intensive way by just multiplying the wchar count by 5.
-	// This will overallocate the buffer in most cases, but it is much faster and memory is cheap.
-   //
-   
-	// 1. Calculate byte length.
-	uint32_t byteLen = count * MAX_BYTES_PER_WCHAR;
-
-	// 2. Allocate result buffer.
-	uint8_t* result = (uint8_t*)AllocateBuffer(byteLen);
-   if (result == NULL)
-      return NULL;
-
-	// 3. Convert to target codepage.
-   (void) WideCharToMultiByte(
-      codepage,
-      0,  // Substitute characters not present in the target codepage, no error on invalid chars, no composite checks.
-      wcharBuffer,
-      count,
-      result,
-      byteLen,
-      NULL,
-      NULL
-   );
-
-	return result;
-}
-
-/// <summary>
 /// Write a wchar buffer to the given output handle using the given codepage.
 /// </summary>
 /// <param name="hOut">File handle of output file.</param>
