@@ -66,6 +66,8 @@ static void ShellSort(LPWSTR* const pAlgorithmNames, const USHORT algorithmCount
 			LPWSTR insertionName = pAlgorithmNames[i];
 			USHORT insertionIndex = i;
 			
+			// It would be correct to use lstrcmpW here, but CompareWcharStringsOrdinal is much faster
+			// and sufficient for the simple ASCII names of the algorithms.
 			while (insertionIndex >= step &&
 					 CompareWcharStringsOrdinal(insertionName, pAlgorithmNames[insertionIndex - step]) < 0) {
 				pAlgorithmNames[insertionIndex] = pAlgorithmNames[insertionIndex - step];
