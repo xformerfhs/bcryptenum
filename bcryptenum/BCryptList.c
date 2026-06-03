@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.2.0
+// Version: 2.3.0
 //
 // Change history:
 //    2023-12-01: V1.0.0: Created.
@@ -39,6 +39,7 @@
 //    2025-12-22: V2.1.4: Simplified list processing.
 //    2025-12-23: V2.1.5: Corrected loop counter of list output.
 //    2026-01-16: V2.2.0: Use own printing subsystem.
+//    2026-06-03: V2.3.0: List key encapsulation mechanisms.
 //
 
 #include <Windows.h>
@@ -116,6 +117,10 @@ static void PrintAlgorithmTypeName(const ULONG algorithmType) {
 
 	case BCRYPT_KEY_DERIVATION_OPERATION:
 		algorithmTypeDescription = "Key derivation";
+		break;
+
+	case BCRYPT_KEY_ENCAPSULATION_OPERATION:
+		algorithmTypeDescription = "Key encapsulation";
 		break;
 
 	default:
@@ -243,6 +248,7 @@ BOOL ListAllTypes() {
 	result &= ListForType(hHeap, BCRYPT_SIGNATURE_OPERATION);
 	result &= ListForType(hHeap, BCRYPT_RNG_OPERATION);
 	result &= ListForType(hHeap, BCRYPT_KEY_DERIVATION_OPERATION);
+	result &= ListForType(hHeap, BCRYPT_KEY_ENCAPSULATION_OPERATION);
 
 	return result;
 }
