@@ -7,6 +7,8 @@ This is a small C program that enumerates all [`BCrypt`](https://learn.microsoft
 It is useful when one wants to use a `BCrypt` algorithm and needs to know which algorithms are supported on a machine, as this depends on the Windows version.
 E.g. the [SHA-3](https://en.wikipedia.org/wiki/SHA-3) hash functions are supported since Windows 11 24H2 (Version 10.0.26100.2161), 9 years after the NIST published the [SHA-3 standard](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf)!
 
+This program needs the Windows SDK V10.0.28000.1839 or newer.
+
 Since [.NET](https://dotnet.microsoft.com/en-us/) – for some reason that completely eludes me – uses the cryptographic functions of the platform OS the list of supported algorithms is relevant for .NET, as well.
 
 This program does not use the C runtime.
