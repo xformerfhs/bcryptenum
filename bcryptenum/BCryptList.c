@@ -196,7 +196,7 @@ static BOOL ListForType(const HANDLE hHeap, const ULONG algorithmType) {
 
 	// 2.1 Check, if any algorithms were found.
 	if (algoCount == 0) {
-		PrintByteBufferStdOut("   <none>\n", 25);
+		PrintByteBufferStdOut("   <none>\n", 10);
 		// It is not necessary to free pAlgoList, since it is NULL if no algorithms were found.
 		return TRUE;
 	}
