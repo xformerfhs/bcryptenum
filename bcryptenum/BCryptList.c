@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.3.0
+// Version: 2.4.0
 //
 // Change history:
 //    2023-12-01: V1.0.0: Created.
@@ -40,6 +40,7 @@
 //    2025-12-23: V2.1.5: Corrected loop counter of list output.
 //    2026-01-16: V2.2.0: Use own printing subsystem.
 //    2026-06-03: V2.3.0: List key encapsulation mechanisms.
+//    2026-06-03: V2.4.0: Do not treat invalid algorithm types as errors.
 //
 
 #include <Windows.h>
@@ -49,6 +50,15 @@
 #include "Printing.h"
 #include "PrintModVersion.h"
 #include "Strings.h"
+
+
+// ******** Macros ********
+
+/// <summary>
+/// Check if the NTSTATUS value indicates success.
+/// </summary>
+#define NTSTATUS_SUCCESS(status) (status >= 0)
+
 
 // ******** Private methods ********
 
@@ -173,17 +183,20 @@ static BOOL ListForType(const HANDLE hHeap, const ULONG algorithmType) {
 	PrintAlgorithmTypeName(algorithmType);
 
 	// 2. Get the list of algorithms of this type.
-	ULONG algoCount;
+	ULONG algoCount = 0;
 	BCRYPT_ALGORITHM_IDENTIFIER* pAlgoList = NULL;
 	NTSTATUS nts = BCryptEnumAlgorithms(algorithmType, &algoCount, &pAlgoList, 0);
-	if (nts < 0) {
+	// STATUS_INVALID_PARAMETER means that the algorithm type is not supported.
+	// Treat this as a successful operation with no algorithms found.
+	if (!NTSTATUS_SUCCESS(nts) && 
+		 (nts != STATUS_INVALID_PARAMETER)) { 
 		PrintNtStatus(functionName, "BCryptEnumAlgorithms", nts);
 		return FALSE;
 	}
 
 	// 2.1 Check, if any algorithms were found.
 	if (algoCount == 0) {
-		PrintByteBufferStdOut("   <no algorithms found>\n", 25);
+		PrintByteBufferStdOut("   <none>\n", 25);
 		// It is not necessary to free pAlgoList, since it is NULL if no algorithms were found.
 		return TRUE;
 	}
