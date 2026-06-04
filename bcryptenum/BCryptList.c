@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.4.0
+// Version: 2.4.1
 //
 // Change history:
 //    2023-12-01: V1.0.0: Created.
@@ -41,6 +41,7 @@
 //    2026-01-16: V2.2.0: Use own printing subsystem.
 //    2026-06-03: V2.3.0: List key encapsulation mechanisms.
 //    2026-06-03: V2.4.0: Do not treat invalid algorithm types as errors.
+//    2026-06-04: V2.4.1: Free algorithm list if it was allocated, but no algorithms were found.
 //
 
 #include <Windows.h>
@@ -197,7 +198,10 @@ static BOOL ListForType(const HANDLE hHeap, const ULONG algorithmType) {
 	// 2.1 Check, if any algorithms were found.
 	if (algoCount == 0) {
 		PrintByteBufferStdOut("   <none>\n", 10);
-		// It is not necessary to free pAlgoList, since it is NULL if no algorithms were found.
+
+		if (pAlgoList != NULL)
+			BCryptFreeBuffer(pAlgoList);
+
 		return TRUE;
 	}
 

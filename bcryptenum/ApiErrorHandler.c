@@ -183,7 +183,7 @@ static void PrintError(const PCHAR functionName, const PCHAR apiName, const DWOR
 		msgLen = GetNtStatusErrorMessage(errorNumber, &lastError);
 
 	PrintByteStringStdErr(functionName);
-	PrintByteStdErr('/');
+	PrintByteStdErr(':');
 	PrintByteStringStdErr(apiName);
 	PrintByteBufferStdErr(" failed with error ", 19);
 
