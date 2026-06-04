@@ -75,7 +75,7 @@ void WriteWithCodepage(
 	const uint32_t count
 ) {
 	// This works by using a pointer into the wchar buffer and converting chunks of wchars.
-	 const wchar_t* p = wcharBuffer;
+	const wchar_t* p = wcharBuffer;
 	uint32_t remaining = count;
 
 	while (remaining > 0) {
@@ -105,7 +105,7 @@ void WriteWithCodepage(
 			break;
 
 	  // 5. Write the converted bytes to the output.
-		if (!WriteFile(hOut, byteBuffer, (DWORD)byteLen, NULL, NULL))
+		if (WriteFile(hOut, byteBuffer, (DWORD)byteLen, NULL, NULL) == FALSE)
 			break;
 
 	  // 6. Advance the pointer and decrease the count.

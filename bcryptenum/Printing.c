@@ -63,12 +63,14 @@ UINT cpStdErr;
 static uint8_t* lowerHexDigits = "0123456789abcdef";
 static uint8_t* upperHexDigits = "0123456789ABCDEF";
 
+
 // ******** Private functions ********
 
 /// <summary>
 /// Get the code page for the given output handle.
 /// </summary>
-/// <param name="h">File handle.</param>
+/// <param name="hFile">File handle.</param>
+/// <param name="consoleCodepage">Console code page.</param>
 static UINT GetCodePageForHandle(const HANDLE hFile, const UINT consoleCodepage) {
 	DWORD mode;
 	// This just checks if the handle is a console handle.

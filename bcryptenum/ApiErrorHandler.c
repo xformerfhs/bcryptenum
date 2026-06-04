@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 3.2.0
+// Version: 3.3.0
 //
 // Change history:
 //    2023-11-18: V1.0.0: Created.
@@ -31,6 +31,7 @@
 //    2026-01-17: V3.0.1: Get module handle for ntdll.dll only once.
 //    2026-01-17: V3.1.0: Use system allocated message buffer; Try US English messages first.
 //    2026-01-17: V3.2.0: Handle error from US English FormatMessage try correctly.
+//    2026-06-03: V3.3.0: Put out the error number as hex, if it is an NT status code.
 //
 
 #include <Windows.h>
@@ -185,10 +186,15 @@ static void PrintError(const PCHAR functionName, const PCHAR apiName, const DWOR
 	PrintByteStdErr('/');
 	PrintByteStringStdErr(apiName);
 	PrintByteBufferStdErr(" failed with error ", 19);
-	PrintUint32StdErr(errorNumber);
-	PrintByteBufferStdErr(" (0x", 4);
-	PrintUpperHexStdErr(errorNumber, 8);
-	PrintByteBufferStdErr("): ", 3);
+
+	if (isNtStatus == FALSE)
+		PrintUint32StdErr(errorNumber);
+	else {
+		PrintByteBufferStdErr("0x", 2);
+		PrintUpperHexStdErr(errorNumber, 8);
+	}
+
+	PrintByteBufferStdErr(": ", 2);
 
 	if (msgLen > 0) {
 		PrintWcharStringStdErr(messageBufferPtr);
@@ -196,9 +202,7 @@ static void PrintError(const PCHAR functionName, const PCHAR apiName, const DWOR
 	} else {
 		PrintByteBufferStdErr("Could not get error message. FormatMessage error code = ", 56);
 		PrintUint32StdErr(lastError);
-		PrintByteBufferStdErr(" (0x", 4);
-		PrintUpperHexStdErr(lastError, 8);
-		PrintByteBufferStdErr(")\n", 2);
+		PrintByteStdErr('\n');
 	}
 }
 
