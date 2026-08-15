@@ -1,5 +1,5 @@
 //
-// SPDX-FileCopyrightText: Copyright 2023-2025 Frank Schwab
+// SPDX-FileCopyrightText: Copyright 2023-2026 Frank Schwab
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 3.0.0
+// Version: 3.0.1
 //
 // Change history:
 //    2024-06-01: V1.0.0: Created.
@@ -30,6 +30,7 @@
 //    2025-11-12: V2.0.0: Output printed in console code page.
 //    2025-12-22: V2.0.1: Removed unnecessary includes and defines.
 //    2026-01-16: V3.0.0: Removed C runtime.
+//    2026-08-15: V3.0.1: Simplified string literal printing.
 //
 
 #include "BCryptList.h"
@@ -44,7 +45,7 @@
 // ******** Main method ********
 
 int __cdecl main() {
-	if (ListAllTypes() != FALSE)
+	if (ListAllTypes())
 		return RC_OK;
 	else
 		return RC_PROC_ERR;

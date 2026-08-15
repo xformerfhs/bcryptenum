@@ -1,5 +1,5 @@
 //
-// SPDX-FileCopyrightText: Copyright 2023-2025 Frank Schwab
+// SPDX-FileCopyrightText: Copyright 2023-2026 Frank Schwab
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 3.3.0
+// Version: 3.3.1
 //
 // Change history:
 //    2023-11-18: V1.0.0: Created.
@@ -32,6 +32,7 @@
 //    2026-01-17: V3.1.0: Use system allocated message buffer; Try US English messages first.
 //    2026-01-17: V3.2.0: Handle error from US English FormatMessage try correctly.
 //    2026-06-03: V3.3.0: Put out the error number as hex, if it is an NT status code.
+//    2026-06-15: V3.3.1: Simplified string literal printing.
 //
 
 #include <Windows.h>
@@ -185,12 +186,12 @@ static void PrintError(const PCHAR functionName, const PCHAR apiName, const DWOR
 	PrintByteStringStdErr(functionName);
 	PrintByteStdErr(':');
 	PrintByteStringStdErr(apiName);
-	PrintByteBufferStdErr(" failed with error ", 19);
+	PrintByteStringLiteralStdErr(" failed with error ");
 
 	if (isNtStatus == FALSE)
 		PrintUint32StdErr(errorNumber);
 	else {
-		PrintByteBufferStdErr("0x", 2);
+		PrintByteStringLiteralStdErr("0x");
 		PrintUpperHexStdErr(errorNumber, 8);
 	}
 
@@ -200,7 +201,7 @@ static void PrintError(const PCHAR functionName, const PCHAR apiName, const DWOR
 		PrintWcharStringStdErr(messageBufferPtr);
 		LocalFree(messageBufferPtr);
 	} else {
-		PrintByteBufferStdErr("Could not get error message. FormatMessage error code = ", 56);
+		PrintByteStringLiteralStdErr("Could not get error message. FormatMessage error code = ");
 		PrintUint32StdErr(lastError);
 		PrintByteStdErr('\n');
 	}

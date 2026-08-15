@@ -107,3 +107,28 @@ void PrintUint32StdOut(const uint32_t number);
 /// </summary>
 /// <param name="number">Integer to print.</param>
 void PrintUint32StdErr(const uint32_t number);
+
+
+/// <summary>
+/// Print a string literal to the specified stream.
+/// </summary>
+/// <remarks>
+/// This will fail, if "str" is a string pointer instead of a string literal.
+/// </remarks>
+#define PrintByteStringLiteral(stream, str) PrintByteBuffer##stream(str, (const uint32_t)(sizeof(str) - 1))
+
+/// <summary>
+/// Print a string literal to stdout.
+/// </summary>
+/// <remarks>
+/// This will fail, if "str" is a string pointer instead of a string literal.
+/// </remarks>
+#define PrintByteStringLiteralStdOut(str) PrintByteStringLiteral(StdOut, str)
+
+/// <summary>
+/// Print a string literal to stderr.
+/// </summary>
+/// <remarks>
+/// This will fail, if "str" is a string pointer instead of a string literal.
+/// </remarks>
+#define PrintByteStringLiteralStdErr(str) PrintByteStringLiteral(StdErr, str)

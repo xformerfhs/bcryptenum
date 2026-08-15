@@ -1,5 +1,5 @@
 //
-// SPDX-FileCopyrightText: Copyright 2023-2025 Frank Schwab
+// SPDX-FileCopyrightText: Copyright 2023-2026 Frank Schwab
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.4.1
+// Version: 2.4.2
 //
 // Change history:
 //    2023-12-01: V1.0.0: Created.
@@ -42,6 +42,7 @@
 //    2026-06-03: V2.3.0: List key encapsulation mechanisms.
 //    2026-06-03: V2.4.0: Do not treat invalid algorithm types as errors.
 //    2026-06-04: V2.4.1: Free algorithm list if it was allocated, but no algorithms were found.
+//    2026-06-15: V2.4.2: Simplified string literal printing.
 //
 
 #include <Windows.h>
@@ -142,7 +143,7 @@ static void PrintAlgorithmTypeName(const ULONG algorithmType) {
 	}
 
 	PrintByteStringStdOut(algorithmTypeDescription);
-	PrintByteBufferStdOut(":\n", 2);
+	PrintByteStringLiteralStdOut(":\n");
 }
 
 /// <summary>
@@ -159,7 +160,7 @@ static LPWSTR* CopyAlgorithmNamePointers(
 ) {
 	LPWSTR* pNameList = HeapAlloc(hHeap, 0, algoCount * sizeof(LPWSTR));
 	if (pNameList == NULL) {
-		PrintByteBufferStdErr("CopyAlgorithmNamePointers:HeapAlloc for algorithm name list failed.\n", 68);
+		PrintByteStringLiteralStdErr("CopyAlgorithmNamePointers:HeapAlloc for algorithm name list failed.\n");
 		return pNameList;
 	}
 
@@ -197,7 +198,7 @@ static BOOL ListForType(const HANDLE hHeap, const ULONG algorithmType) {
 
 	// 2.1 Check, if any algorithms were found.
 	if (algoCount == 0) {
-		PrintByteBufferStdOut("   <none>\n", 10);
+		PrintByteStringLiteralStdOut("   <none>\n");
 
 		if (pAlgoList != NULL)
 			BCryptFreeBuffer(pAlgoList);
@@ -224,7 +225,7 @@ static BOOL ListForType(const HANDLE hHeap, const ULONG algorithmType) {
 	// Pointer to algorithm identifier.
 	LPWSTR* pActAlgoName = pSortedList;
 	for (ULONG i = 0; i < algoCount; i++) {
-		PrintByteBufferStdOut("   ", 3);
+		PrintByteStringLiteralStdOut("   ");
 		PrintWcharStringStdOut(*pActAlgoName++);
 		PrintByteStdOut('\n');
 	}
@@ -246,9 +247,9 @@ BOOL ListAllTypes() {
 	const PCHAR functionName = "ListAllTypes";
 
 	// 1. Print header.
-	PrintByteBufferStdOut("\nList of Bcrypt ", 16);
+	PrintByteStringLiteralStdOut("\nList of bcrypt ");
 	PrintModuleVersion("bcrypt.dll");
-	PrintByteBufferStdOut(" algorithms by type:\n", 21);
+	PrintByteStringLiteralStdOut(" algorithms by type:\n");
 	
 	// 2. Get the process heap to use in the list functions.
 	HANDLE hHeap = GetProcessHeap();
