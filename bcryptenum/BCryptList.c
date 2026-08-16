@@ -136,7 +136,7 @@ static void PrintAlgorithmTypeName(const ULONG algorithmType) {
 		break;
 
 	default:
-		PrintByteBufferStdErr("Unknown algorithm type 0x", 25);
+		PrintByteStringLiteralStdErr("Unknown algorithm type 0x");
 		PrintLowerHexStdErr(algorithmType, 2);
 		PrintByteStdErr('\n');
 		return;
