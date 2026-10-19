@@ -36,7 +36,6 @@
 //
 
 #include <Windows.h>
-#include <bcrypt.h>
 
 #include "Printing.h"
 
