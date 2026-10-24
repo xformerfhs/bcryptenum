@@ -94,7 +94,7 @@ static void PrintHex(
 
 	// Prepend leading zeros, if necessary.
 	while (length < size) {
-		*--p = '0';
+		*--p = L'0';
 		length++;
 	}
 
