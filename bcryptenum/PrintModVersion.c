@@ -20,13 +20,14 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.1.0
+// Version: 2.1.0
 //
 // Change history:
 //    2024-11-12: V1.0.0: Created.
 //    2024-11-13: V1.0.1: Small change.
 //    2026-01-16: V1.0.0: Use own printing subystem.
 //    2026-10-23: V2.0.0: Converted to wchar.
+//    2026-10-24: V2.1.0: Fixed premature freeing of the version information blob.
 //
 
 #include <stdlib.h>
@@ -99,6 +100,7 @@ void PrintModuleVersion(const PWCHAR moduleName) {
 	//    Why is this not just some structure?
 
 	// This is where the file version numbers will be copied to.
+	// It is part of the data pointed to by pFileVersionInfo.
 	VS_FIXEDFILEINFO* pfi;
 	UINT fiLength;
 	if (VerQueryValueW(pFileVersionInfo, L"\\", &pfi, &fiLength) == FALSE) {
@@ -107,13 +109,10 @@ void PrintModuleVersion(const PWCHAR moduleName) {
 		return;
 	}
 
-	// 7. Release the memory of the version information blob.
-	HeapFree(hHeap, 0, pFileVersionInfo);
 
-
-	// Hooray! Done! We can print the version information.
-	// But wait... The version is hidden in DWORDs which we have to untangle ourselves.
-	// This is so bizarre...
+	// 7. Hooray! Done! We can print the version information.
+	//    But wait... The version is hidden in DWORDs which we have to untangle ourselves.
+	//    This is so bizarre...
 	PrintWcharStdOut(L'V');
 	PrintUint32StdOut((pfi->dwProductVersionMS >> 16) & 0xffff);
 	PrintWcharStdOut(L'.');
@@ -122,4 +121,8 @@ void PrintModuleVersion(const PWCHAR moduleName) {
 	PrintUint32StdOut((pfi->dwProductVersionLS >> 16) & 0xffff);
 	PrintWcharStdOut(L'.');
 	PrintUint32StdOut(pfi->dwProductVersionLS & 0xffff);
+
+	// 8. Release the memory of the version information blob after the information
+	//    has been printed.
+	HeapFree(hHeap, 0, pFileVersionInfo);
 }

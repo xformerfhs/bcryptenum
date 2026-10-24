@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Change history:
 //    2024-06-01: V1.0.0: Created.
@@ -32,6 +32,7 @@
 //    2026-01-16: V3.0.0: Removed C runtime.
 //    2026-08-15: V3.0.1: Simplified string literal printing.
 //    2026-10-23: V4.0.0: Converted to wchar and console processing.
+//    2026-10-24: V4.1.0: Fixed memory freeing error in file information printing.
 //
 
 #include "BCryptList.h"
