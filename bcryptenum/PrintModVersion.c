@@ -36,9 +36,6 @@
 #include "Printing.h"
 
 
-// ******** Private data ********
-
-
 // ******** Public methods ********
 
 /// <summary>
