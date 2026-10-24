@@ -109,7 +109,6 @@ void PrintModuleVersion(const PWCHAR moduleName) {
 		return;
 	}
 
-
 	// 7. Hooray! Done! We can print the version information.
 	//    But wait... The version is hidden in DWORDs which we have to untangle ourselves.
 	//    This is so bizarre...
