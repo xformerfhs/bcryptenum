@@ -19,5 +19,5 @@ typedef struct {
 /// Initialize the output streams.
 /// </summary>
 /// <param name="outStream">Pointer to standard output stream.</param>
-/// <param name="outStream">Pointer to standard error stream.</param>
+/// <param name="errStream">Pointer to standard error stream.</param>
 void OutStreamInit(OUT_STREAM* outStream, OUT_STREAM* errStream);

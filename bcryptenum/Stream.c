@@ -34,7 +34,7 @@
 
 // ******** Constants ********
 
-#define CHUNK_CHAR_LEN 1024
+#define CHUNK_CHAR_LEN 256
 #define CHUNK_BYTE_LEN (CHUNK_CHAR_LEN * 3)
 
 
@@ -117,7 +117,7 @@ static void ActOutStreamInit(OUT_STREAM* stream, DWORD stdId) {
 /// Initialize the output streams.
 /// </summary>
 /// <param name="outStream">Pointer to standard output stream.</param>
-/// <param name="outStream">Pointer to standard error stream.</param>
+/// <param name="errStream">Pointer to standard error stream.</param>
 void OutStreamInit(OUT_STREAM* outStream, OUT_STREAM* errStream) {
    if (outStream != NULL)
       ActOutStreamInit(outStream, STD_OUTPUT_HANDLE);
