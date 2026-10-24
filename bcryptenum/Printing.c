@@ -22,78 +22,70 @@
 //
 // Author: Frank Schwab
 //
-// Version: 3.0.0
+// Version: 4.0.0
 //
 // Change history:
 //    2026-01-13: V1.0.0: Created.
 //    2026-01-15: V2.0.0: Completely reworked to use wide char input and output with code pages.
 //    2026-01-15: V3.0.0: Offer byte and wchar functions, make output codepage available.
+//    2026-10-23: V4.0.0: Converted to wchar and streams.
 //
 
 #include <Windows.h>
 
 #include <stdint.h>
 
-#include "Codepage.h"
+#include "Stream.h"
 #include "Strings.h"
+
+
+// ******** Private constants ********
+
+/// <summary>
+/// Lower hex digits.
+/// </summary>
+static wchar_t* lowerHexDigits = L"0123456789abcdef";
+
+/// <summary>
+/// Upper hex digits.
+/// </summary>
+static wchar_t* upperHexDigits = L"0123456789ABCDEF";
 
 
 // ******** Private variables ********
 
 /// <summary>
-/// Handle to standard output.
+/// Standard output stream.
 /// </summary>
-HANDLE hStdOut;
+static OUT_STREAM outStream;
 
 /// <summary>
-/// Handle to standard error.
+/// Standard error stream.
 /// </summary>
-HANDLE hStdErr;
-
-/// <summary>
-/// Code page for standard output.
-/// </summary>
-UINT cpStdOut;
-
-/// <summary>
-/// Code page for standard error.
-/// </summary>
-UINT cpStdErr;
-
-static uint8_t* lowerHexDigits = "0123456789abcdef";
-static uint8_t* upperHexDigits = "0123456789ABCDEF";
+static OUT_STREAM errStream;
 
 
 // ******** Private functions ********
 
 /// <summary>
-/// Get the code page for the given output handle.
-/// </summary>
-/// <param name="hFile">File handle.</param>
-/// <param name="consoleCodepage">Console code page.</param>
-static UINT GetCodePageForHandle(const HANDLE hFile, const UINT consoleCodepage) {
-	DWORD mode;
-	// This just checks if the handle is a console handle.
-	if (GetConsoleMode(hFile, &mode))
-		return consoleCodepage;  // Return console code page, if the handle refers to a console.
-	else
-		return CP_UTF8;			 // Otherwise, return UTF-8.
-}
-
-/// <summary>
 /// Print a hexadecimal number to the given output handle.
 /// </summary>
-/// <param name="hOutput">Output handle.</param>
+/// <param name="stream">Output stream.</param>
 /// <param name="number">Number to print.</param>
 /// <param name="size">Size of number.</param>
 /// <param name="hexDigits">List of hex digits.</param>
-static void PrintHex(const HANDLE hOutput, uint32_t number, const uint8_t size, const uint8_t* const hexDigits) {
+static void PrintHex(
+	const OUT_STREAM* stream,
+	uint32_t number, 
+	const uint8_t size, 
+	const wchar_t* const hexDigits
+) {
 	// Maximum 8 hex digits for uint32_t.
-	uint8_t hexBuffer[8];
-	uint8_t* p = &hexBuffer[8];  // Initialize pointer to be one past the end of the buffer.
+	wchar_t hexBuffer[8];
+	wchar_t* p = &hexBuffer[8];  // Initialize pointer to be one past the end of the buffer.
 	uint8_t length = 0;
 
-	// Convert number to hex digits (at least one digit)
+	// Convert number to hex digits (at least one digit).
 	do {
 		*--p = hexDigits[number & 0x0F];
 		number >>= 4;
@@ -107,29 +99,29 @@ static void PrintHex(const HANDLE hOutput, uint32_t number, const uint8_t size, 
 	}
 
 	// Write the string to the output.
-	WriteFile(hOutput, p, (DWORD)length, NULL, NULL);
+	stream->write(stream->handle, p, (DWORD)length);
 }
 
 /// <summary>
 /// Print an integer to the given output handle.
 /// </summary>
-/// <param name="hOutput">Output handle.</param>
+/// <param name="stream">Output stream.</param>
 /// <param name="number">Integer to print.</param>
-static void PrintUint32(const HANDLE hOutput, const UINT codePage, uint32_t number) {
-	uint8_t numberBuffer[10];  // Maximum 10 decimal digits for uint32_t.
-	uint8_t* p = &numberBuffer[10]; // Initialize pointer to be one past the end of the buffer.
+static void PrintUint32(const OUT_STREAM* stream, uint32_t number) {
+	wchar_t numberBuffer[10];  // Maximum 10 decimal digits for uint32_t.
+	wchar_t* p = &numberBuffer[10]; // Initialize pointer to be one past the end of the buffer.
 
 	// Convert the number to string in reverse order.
 	uint8_t length = 0;
 	do {
-		uint8_t digit = number % 10;
-		*--p = ('0' + digit);
+		uint16_t digit = number % 10;
+		*--p = (L'0' + digit);
 		number /= 10;
 		length++;
 	} while (number != 0);
 
-	// Write the string to the output. This is
-	WriteFile(hOutput, p, (DWORD)length, NULL, NULL);
+	// Write the string to the output.
+	stream->write(stream->handle, p, (DWORD)length);
 }
 
 
@@ -139,66 +131,27 @@ static void PrintUint32(const HANDLE hOutput, const UINT codePage, uint32_t numb
 /// Initialize the printing system.
 /// </summary>
 void InitializePrinting() {
-	// 1. Get file handles to standard output and standard error.
-	hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-	hStdErr = GetStdHandle(STD_ERROR_HANDLE);
-
-	// 2. Get code pages for standard output and standard error.
-	UINT consoleCodepage = GetConsoleOutputCP();
-	cpStdOut = GetCodePageForHandle(hStdOut, consoleCodepage);
-	cpStdErr = GetCodePageForHandle(hStdErr, consoleCodepage);
+	OutStreamInit(&outStream, &errStream);
 }
 
 /// <summary>
-/// Get the code page for standard output.
-/// </summary>
-/// <returns></returns>
-uint32_t GetCodePageStdOut() {
-	return (uint32_t)cpStdOut;
-}
-
-/// <summary>
-/// Get the code page for standard error.
-/// </summary>
-/// <returns></returns>
-uint32_t GetCodePageStdErr() {
-	return (uint32_t)cpStdErr;
-}
-
-/// <summary>
-/// Print a byte buffer to standard output.
+/// Print a wide char buffer to standard output.
 /// </summary>
 /// <param name="buffer">Buffer to print.</param>
 /// <param name="bufferCount">Count of bytes in buffer.</param>
-void PrintByteBufferStdOut(const uint8_t* const buffer, const uint32_t bufferCount) {
+void PrintWcharBufferStdOut(const wchar_t* const buffer, const uint32_t bufferCount) {
 	if (bufferCount != 0)
-		WriteFile(hStdOut, buffer, (DWORD)bufferCount, NULL, NULL);
+		outStream.write(outStream.handle, buffer, bufferCount);
 }
 
 /// <summary>
-/// Print a byte buffer to standard error.
+/// Print a wide char buffer to standard error.
 /// </summary>
 /// <param name="buffer">Buffer to print.</param>
 /// <param name="bufferCount">Count of bytes in buffer.</param>
-void PrintByteBufferStdErr(const uint8_t* const buffer, const uint32_t bufferCount) {
+void PrintWcharBufferStdErr(const wchar_t* const buffer, const uint32_t bufferCount) {
 	if (bufferCount != 0)
-		WriteFile(hStdErr, buffer, (DWORD)bufferCount, NULL, NULL);
-}
-
-/// <summary>
-/// Print a byte string to standard output.
-/// </summary>
-/// <param name="str">String to print.</param>
-void PrintByteStringStdOut(const uint8_t* const str) {
-	PrintByteBufferStdOut(str, ByteStringLength(str));
-}
-
-/// <summary>
-/// Print a byte string to standard error.
-/// </summary>
-/// <param name="str">String to print.</param>
-void PrintByteStringStdErr(const uint8_t* const str) {
-	PrintByteBufferStdErr(str, ByteStringLength(str));
+		outStream.write(errStream.handle, buffer, bufferCount);
 }
 
 /// <summary>
@@ -206,7 +159,7 @@ void PrintByteStringStdErr(const uint8_t* const str) {
 /// </summary>
 /// <param name="str">String to print.</param>
 void PrintWcharStringStdOut(const wchar_t* const str) {
-	WriteWithCodepage(hStdOut, cpStdOut, str, WcharStringLength(str));
+	outStream.write(outStream.handle, str, WcharStringLength(str));
 }
 
 /// <summary>
@@ -214,27 +167,27 @@ void PrintWcharStringStdOut(const wchar_t* const str) {
 /// </summary>
 /// <param name="str">String to print.</param>
 void PrintWcharStringStdErr(const wchar_t* const str) {
-	WriteWithCodepage(hStdErr, cpStdErr, str, WcharStringLength(str));
+	errStream.write(errStream.handle, str, WcharStringLength(str));
 }
 
 /// <summary>
-/// Print a byte to standard output.
+/// Print a wide char to standard output.
 /// </summary>
-/// <param name="b">Byte to print.</param>
-void PrintByteStdOut(const uint8_t b) {
-	uint8_t temp[1];
+/// <param name="b">Wide char to print.</param>
+void PrintWcharStdOut(const wchar_t b) {
+	wchar_t temp[1];
 	temp[0] = b;
-	WriteFile(hStdOut, temp, 1, NULL, NULL);
+	outStream.write(outStream.handle, temp, 1);
 }
 
 /// <summary>
-/// Print a byte to standard error.
+/// Print a wide char to standard error.
 /// </summary>
-/// <param name="b">Byte to print.</param>
-void PrintByteStdErr(const uint8_t b) {
-	uint8_t temp[1];
+/// <param name="b">Wide char to print.</param>
+void PrintWcharStdErr(const wchar_t b) {
+	wchar_t temp[1];
 	temp[0] = b;
-	WriteFile(hStdErr, temp, 1, NULL, NULL);
+	errStream.write(errStream.handle, temp, 1);
 }
 
 /// <summary>
@@ -243,7 +196,7 @@ void PrintByteStdErr(const uint8_t b) {
 /// <param name="number">Number to print.</param>
 /// <param name="size">Size of printed number.</param>
 void PrintUpperHexStdOut(const uint32_t number, const uint8_t size) {
-	PrintHex(hStdOut, number, size, upperHexDigits);
+	PrintHex(&outStream, number, size, upperHexDigits);
 }
 
 /// <summary>
@@ -252,7 +205,7 @@ void PrintUpperHexStdOut(const uint32_t number, const uint8_t size) {
 /// <param name="number">Number to print.</param>
 /// <param name="size">Size of printed number.</param>
 void PrintLowerHexStdOut(const uint32_t number, const uint8_t size) {
-	PrintHex(hStdOut, number, size, lowerHexDigits);
+	PrintHex(&outStream, number, size, lowerHexDigits);
 }
 
 /// <summary>
@@ -261,7 +214,7 @@ void PrintLowerHexStdOut(const uint32_t number, const uint8_t size) {
 /// <param name="number">Number to print.</param>
 /// <param name="size">Size of printed number.</param>
 void PrintUpperHexStdErr(const uint32_t number, const uint8_t size) {
-	PrintHex(hStdErr, number, size, upperHexDigits);
+	PrintHex(&errStream, number, size, upperHexDigits);
 }
 
 /// <summary>
@@ -270,7 +223,7 @@ void PrintUpperHexStdErr(const uint32_t number, const uint8_t size) {
 /// <param name="number">Number to print.</param>
 /// <param name="size">Size of printed number.</param>
 void PrintLowerHexStdErr(const uint32_t number, const uint8_t size) {
-	PrintHex(hStdErr, number, size, lowerHexDigits);
+	PrintHex(&errStream, number, size, lowerHexDigits);
 }
 
 /// <summary>
@@ -278,7 +231,7 @@ void PrintLowerHexStdErr(const uint32_t number, const uint8_t size) {
 /// </summary>
 /// <param name="number">Integer to print.</param>
 void PrintUint32StdOut(const uint32_t number) {
-	PrintUint32(hStdOut, cpStdOut, number);
+	PrintUint32(&outStream, number);
 }
 
 /// <summary>
@@ -286,5 +239,5 @@ void PrintUint32StdOut(const uint32_t number) {
 /// </summary>
 /// <param name="number">Integer to print.</param>
 void PrintUint32StdErr(const uint32_t number) {
-	PrintUint32(hStdErr, cpStdErr, number);
+	PrintUint32(&errStream, number);
 }

@@ -22,30 +22,17 @@
 //
 // Author: Frank Schwab
 //
-// Version: 3.1.0
+// Version: 4.0.0
 //
 // Change history:
 //    2026-01-13: V1.0.0: Created.
 //    2026-01-14: V2.0.0: Added Utf16StringLength.
 //    2026-01-15: V3.0.0: Support byte and wchar strings.
 //    2026-06-03: V3.1.0: Made 0 checks explicit.
+//    2026-10-23: V4.0.0: Converted to wchar.
 //
 
 #include <stdint.h>
-
-/// <summary>
-/// Get the length of a null-terminated string.
-/// </summary>
-/// <param name="str">String.</param>
-/// <returns>Length of string.</returns>
-uint32_t ByteStringLength(const uint8_t* const str) {
-	const uint8_t* p = str;
-
-	while (*p != 0)
-		p++;
-
-	return (uint32_t)(p - str);
-}
 
 /// <summary>
 /// Get the length of a null-terminated string.

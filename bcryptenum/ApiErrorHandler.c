@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 3.3.1
+// Version: 4.0.0
 //
 // Change history:
 //    2023-11-18: V1.0.0: Created.
@@ -33,6 +33,7 @@
 //    2026-01-17: V3.2.0: Handle error from US English FormatMessage try correctly.
 //    2026-06-03: V3.3.0: Put out the error number as hex, if it is an NT status code.
 //    2026-06-15: V3.3.1: Simplified string literal printing.
+//    2026-10-23: V4.0.0: Converted to wchar.
 //
 
 #include <Windows.h>
@@ -174,7 +175,7 @@ static DWORD GetSystemErrorMessage(const DWORD errorNumber, DWORD* const pLastEr
 /// <param name="apiName">Name of the failing Windows API function.</param>
 /// <param name="errorNumber">Error number.</param>
 /// <param name="isNtStatus">Is the error number an NTSTATUS.</param>
-static void PrintError(const PCHAR functionName, const PCHAR apiName, const DWORD errorNumber, const BOOL isNtStatus) {
+static void PrintError(const PWCHAR functionName, const PWCHAR apiName, const DWORD errorNumber, const BOOL isNtStatus) {
 	DWORD lastError = 0;
 	DWORD msgLen;
 	if (isNtStatus == FALSE)
@@ -182,27 +183,27 @@ static void PrintError(const PCHAR functionName, const PCHAR apiName, const DWOR
 	else
 		msgLen = GetNtStatusErrorMessage(errorNumber, &lastError);
 
-	PrintByteStringStdErr(functionName);
-	PrintByteStdErr(':');
-	PrintByteStringStdErr(apiName);
-	PrintByteStringLiteralStdErr(" failed with error ");
+	PrintWcharStringStdErr(functionName);
+	PrintWcharStdErr(L':');
+	PrintWcharStringStdErr(apiName);
+	PrintWcharStringLiteralStdErr(L" failed with error ");
 
 	if (isNtStatus == FALSE)
 		PrintUint32StdErr(errorNumber);
 	else {
-		PrintByteStringLiteralStdErr("0x");
+		PrintWcharStringLiteralStdErr(L"0x");
 		PrintUpperHexStdErr(errorNumber, 8);
 	}
 
-	PrintByteBufferStdErr(": ", 2);
+	PrintWcharBufferStdErr(L": ", 2);
 
 	if (msgLen > 0) {
 		PrintWcharStringStdErr(messageBufferPtr);
 		LocalFree(messageBufferPtr);
 	} else {
-		PrintByteStringLiteralStdErr("Could not get error message. FormatMessage error code = ");
+		PrintWcharStringLiteralStdErr(L"Could not get error message. FormatMessage error code = ");
 		PrintUint32StdErr(lastError);
-		PrintByteStdErr('\n');
+		PrintWcharStringLiteralStdErr(L"\r\n");
 	}
 }
 
@@ -215,7 +216,7 @@ static void PrintError(const PCHAR functionName, const PCHAR apiName, const DWOR
 /// <param name="functionName">Name of the function calling the failing Windows API function.</param>
 /// <param name="apiName">Name of the failing Windows API function.</param>
 /// <param name="errorNumber">Error number.</param>
-void PrintWinError(const PCHAR functionName, const PCHAR apiName, const DWORD errorNumber) {
+void PrintWinError(const PWCHAR functionName, const PWCHAR apiName, const DWORD errorNumber) {
 	PrintError(functionName, apiName, errorNumber, FALSE);
 }
 
@@ -224,7 +225,7 @@ void PrintWinError(const PCHAR functionName, const PCHAR apiName, const DWORD er
 /// </summary>
 /// <param name="functionName">Name of the function calling the failing Windows API function.</param>
 /// <param name="apiName">Name of the failing Windows API function.</param>
-void PrintLastError(const PCHAR functionName, const PCHAR apiName) {
+void PrintLastError(const PWCHAR functionName, const PWCHAR apiName) {
 	PrintWinError(functionName, apiName, GetLastError());
 }
 
@@ -234,6 +235,6 @@ void PrintLastError(const PCHAR functionName, const PCHAR apiName) {
 /// <param name="functionName">Name of the function calling the failing Windows API function.</param>
 /// <param name="apiName">Name of the failing Windows API function.</param>
 /// <param name="errorStatus">NTSTATUS of failing function.</param>
-void PrintNtStatus(const PCHAR functionName, const PCHAR apiName, const NTSTATUS errorStatus) {
+void PrintNtStatus(const PWCHAR functionName, const PWCHAR apiName, const NTSTATUS errorStatus) {
 	PrintError(functionName, apiName, (DWORD)errorStatus, TRUE);
 }

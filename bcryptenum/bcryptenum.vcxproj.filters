@@ -27,9 +27,6 @@
     <ClCompile Include="PrintModVersion.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Codepage.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Printing.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -37,6 +34,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Startup.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Stream.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -50,13 +50,13 @@
     <ClInclude Include="PrintModVersion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Codepage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Printing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Strings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Stream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

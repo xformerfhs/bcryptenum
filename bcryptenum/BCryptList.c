@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.4.2
+// Version: 3.0.0
 //
 // Change history:
 //    2023-12-01: V1.0.0: Created.
@@ -43,10 +43,10 @@
 //    2026-06-03: V2.4.0: Do not treat invalid algorithm types as errors.
 //    2026-06-04: V2.4.1: Free algorithm list if it was allocated, but no algorithms were found.
 //    2026-06-15: V2.4.2: Simplified string literal printing.
+//    2026-10-23: V3.0.0: Converted to wchar.
 //
 
 #include <Windows.h>
-#include <bcrypt.h>
 
 #include "ApiErrorHandler.h"
 #include "Printing.h"
@@ -98,52 +98,52 @@ static void ShellSort(LPWSTR* const pAlgorithmNames, const USHORT algorithmCount
 /// </summary>
 /// <param name="algorithmType">BCrypt algorithm type.</param>
 static void PrintAlgorithmTypeName(const ULONG algorithmType) {
-	PrintByteStdOut('\n');
+	PrintWcharStringLiteralStdOut(L"\r\n");
 
-	char* algorithmTypeDescription;
+	wchar_t* algorithmTypeDescription;
 
 	switch (algorithmType) {
 	case BCRYPT_CIPHER_OPERATION:
-		algorithmTypeDescription = "Symmetric ciphers";
+		algorithmTypeDescription = L"Symmetric ciphers";
 		break;
 
 	case BCRYPT_HASH_OPERATION:
-		algorithmTypeDescription = "Hashes";
+		algorithmTypeDescription = L"Hashes";
 		break;
 
 	case BCRYPT_ASYMMETRIC_ENCRYPTION_OPERATION:
-		algorithmTypeDescription = "Asymmetric ciphers";
+		algorithmTypeDescription = L"Asymmetric ciphers";
 		break;
 
 	case BCRYPT_SECRET_AGREEMENT_OPERATION:
-		algorithmTypeDescription = "Secret agreements";
+		algorithmTypeDescription = L"Secret agreements";
 		break;
 
 	case BCRYPT_SIGNATURE_OPERATION:
-		algorithmTypeDescription = "Signatures";
+		algorithmTypeDescription = L"Signatures";
 		break;
 
 	case BCRYPT_RNG_OPERATION:
-		algorithmTypeDescription = "Pseudorandom Number Generators";
+		algorithmTypeDescription = L"Pseudorandom Number Generators";
 		break;
 
 	case BCRYPT_KEY_DERIVATION_OPERATION:
-		algorithmTypeDescription = "Key derivation";
+		algorithmTypeDescription = L"Key derivation";
 		break;
 
 	case BCRYPT_KEY_ENCAPSULATION_OPERATION:
-		algorithmTypeDescription = "Key encapsulation";
+		algorithmTypeDescription = L"Key encapsulation";
 		break;
 
 	default:
-		PrintByteStringLiteralStdErr("Unknown algorithm type 0x");
+		PrintWcharStringLiteralStdErr(L"Unknown algorithm type 0x");
 		PrintLowerHexStdErr(algorithmType, 2);
-		PrintByteStdErr('\n');
+		PrintWcharStringLiteralStdErr(L"\r\n");
 		return;
 	}
 
-	PrintByteStringStdOut(algorithmTypeDescription);
-	PrintByteStringLiteralStdOut(":\n");
+	PrintWcharStringStdOut(algorithmTypeDescription);
+	PrintWcharStringLiteralStdOut(L":\r\n");
 }
 
 /// <summary>
@@ -160,7 +160,7 @@ static LPWSTR* CopyAlgorithmNamePointers(
 ) {
 	LPWSTR* pNameList = HeapAlloc(hHeap, 0, algoCount * sizeof(LPWSTR));
 	if (pNameList == NULL) {
-		PrintByteStringLiteralStdErr("CopyAlgorithmNamePointers:HeapAlloc for algorithm name list failed.\n");
+		PrintWcharStringLiteralStdErr(L"CopyAlgorithmNamePointers:HeapAlloc for algorithm name list failed.\n");
 		return pNameList;
 	}
 
@@ -179,7 +179,7 @@ static LPWSTR* CopyAlgorithmNamePointers(
 /// <param name="hHeap">Handle of the local heap.</param>
 /// <param name="algorithmType">BCrypt algorithm type.</param>
 static BOOL ListForType(const HANDLE hHeap, const ULONG algorithmType) {
-	const PCHAR functionName = "ListForType";
+	const PWCHAR functionName = L"ListForType";
 
 	// 1. Print the algorithm type.
 	PrintAlgorithmTypeName(algorithmType);
@@ -192,13 +192,13 @@ static BOOL ListForType(const HANDLE hHeap, const ULONG algorithmType) {
 	// Treat this as a successful operation with no algorithms found.
 	if (!NTSTATUS_SUCCESS(nts) && 
 		 (nts != STATUS_INVALID_PARAMETER)) { 
-		PrintNtStatus(functionName, "BCryptEnumAlgorithms", nts);
+		PrintNtStatus(functionName, L"BCryptEnumAlgorithms", nts);
 		return FALSE;
 	}
 
 	// 2.1 Check, if any algorithms were found.
 	if (algoCount == 0) {
-		PrintByteStringLiteralStdOut("   <none>\n");
+		PrintWcharStringLiteralStdOut(L"   <none>\r\n");
 
 		if (pAlgoList != NULL)
 			BCryptFreeBuffer(pAlgoList);
@@ -225,9 +225,9 @@ static BOOL ListForType(const HANDLE hHeap, const ULONG algorithmType) {
 	// Pointer to algorithm identifier.
 	LPWSTR* pActAlgoName = pSortedList;
 	for (ULONG i = 0; i < algoCount; i++) {
-		PrintByteStringLiteralStdOut("   ");
+		PrintWcharStringLiteralStdOut(L"   ");
 		PrintWcharStringStdOut(*pActAlgoName++);
-		PrintByteStdOut('\n');
+		PrintWcharStringLiteralStdOut(L"\r\n");
 	}
 
 	// 5. Release memory.
@@ -244,17 +244,17 @@ static BOOL ListForType(const HANDLE hHeap, const ULONG algorithmType) {
 /// Print the names of all BCrypt algorithms.
 /// </summary>
 BOOL ListAllTypes() {
-	const PCHAR functionName = "ListAllTypes";
+	const PWCHAR functionName = L"ListAllTypes";
 
 	// 1. Print header.
-	PrintByteStringLiteralStdOut("\nList of bcrypt ");
-	PrintModuleVersion("bcrypt.dll");
-	PrintByteStringLiteralStdOut(" algorithms by type:\n");
+	PrintWcharStringLiteralStdOut(L"\r\nList of bcrypt ");
+	PrintModuleVersion(L"bcrypt.dll");
+	PrintWcharStringLiteralStdOut(L" algorithms by type:\r\n");
 	
 	// 2. Get the process heap to use in the list functions.
 	HANDLE hHeap = GetProcessHeap();
 	if (hHeap == NULL) {
-		PrintLastError(functionName, "GetProcessHeap");
+		PrintLastError(functionName, L"GetProcessHeap");
 		return FALSE;
 	}
 

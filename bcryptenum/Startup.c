@@ -34,13 +34,12 @@
 #include <Windows.h>
 
 #include "Printing.h"
-#include "Strings.h"
 
 
 /// <summary>
 /// Main function prototype.
 /// </summary>
-int __cdecl main();
+int __cdecl wmain();
 
 /// <summary>
 /// This is the program entry point. It is jumped to from the OS loader, not called.
@@ -50,5 +49,5 @@ void Startup() {
 	InitializePrinting();
 
 	// 2. Call main and exit process with its return code. The program does not use commandline arguments.
-	ExitProcess(main());
+	ExitProcess(wmain());
 }

@@ -150,18 +150,18 @@
     <ClCompile Include="BcryptEnum.c" />
     <ClCompile Include="ApiErrorHandler.c" />
     <ClCompile Include="BCryptList.c" />
-    <ClCompile Include="Codepage.c" />
     <ClCompile Include="Printing.c" />
     <ClCompile Include="PrintModVersion.c" />
     <ClCompile Include="Startup.c" />
+    <ClCompile Include="Stream.c" />
     <ClCompile Include="Strings.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApiErrorHandler.h" />
     <ClInclude Include="BCryptList.h" />
-    <ClInclude Include="Codepage.h" />
     <ClInclude Include="Printing.h" />
     <ClInclude Include="PrintModVersion.h" />
+    <ClInclude Include="Stream.h" />
     <ClInclude Include="Strings.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

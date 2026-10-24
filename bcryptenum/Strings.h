@@ -7,13 +7,6 @@
 /// </summary>
 /// <param name="str">String.</param>
 /// <returns>Length of string.</returns>
-uint32_t ByteStringLength(const uint8_t* const str);
-
-/// <summary>
-/// Get the length of a null-terminated string.
-/// </summary>
-/// <param name="str">String.</param>
-/// <returns>Length of string.</returns>
 uint32_t WcharStringLength(const wchar_t* const str);
 
 /// <summary>
