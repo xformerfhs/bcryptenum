@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.1.0
+// Version: 2.2.0
 //
 // Change history:
 //    2024-11-12: V1.0.0: Created.
@@ -28,6 +28,7 @@
 //    2026-01-16: V1.0.0: Use own printing subystem.
 //    2026-10-23: V2.0.0: Converted to wchar.
 //    2026-10-24: V2.1.0: Fixed premature freeing of the version information blob.
+//    2026-10-25: V2.2.0: Fixed wrong tests of return values.
 //
 
 #include <stdlib.h>
@@ -52,15 +53,15 @@ void PrintModuleVersion(const PWCHAR moduleName) {
 
 	// 1. Get the module handle from the module name.
 	HMODULE hModule = GetModuleHandleW(moduleName);
-	if (hModule == INVALID_HANDLE_VALUE) {
+	if (hModule == NULL) {
 		PrintLastError(functionName, L"GetModuleHandle");
 		return;
 	}
 
 	// 2. Get the file name from the module handle.   
 	WCHAR fileName[MAX_PATH];
-	GetModuleFileNameW(hModule, fileName, _countof(fileName));
-	if (GetLastError() != 0) {
+	DWORD fileNameLen = GetModuleFileNameW(hModule, fileName, _countof(fileName));
+	if (fileNameLen == 0 || fileNameLen == _countof(fileName)) {
 		PrintLastError(functionName, L"GetModuleFileName");
 		return;
 	}
