@@ -12,15 +12,15 @@ void InitializePrinting();
 /// Print a wide char buffer to standard output.
 /// </summary>
 /// <param name="buffer">Buffer to print.</param>
-/// <param name="bufferCount">Count of bytes in buffer.</param>
-void PrintWcharBufferStdOut(const wchar_t* const buffer, const uint32_t bufferCount);
+/// <param name="charCount">Count of characters in buffer.</param>
+void PrintWcharBufferStdOut(const wchar_t* const buffer, const uint32_t charCount);
 
 /// <summary>
 /// Print a wide char buffer to standard error.
 /// </summary>
 /// <param name="buffer">Buffer to print.</param>
-/// <param name="bufferCount">Count of bytes in buffer.</param>
-void PrintWcharBufferStdErr(const wchar_t* const buffer, const uint32_t bufferCount);
+/// <param name="charCount">Count of characters in buffer.</param>
+void PrintWcharBufferStdErr(const wchar_t* const buffer, const uint32_t charCount);
 
 /// <summary>
 /// Print a wchar string to standard output.
@@ -41,9 +41,9 @@ void PrintWcharStringStdErr(const wchar_t* const str);
 void PrintWcharStdOut(const wchar_t b);
 
 /// <summary>
-/// Print a byte to standard error.
+/// Print a wide char to standard error.
 /// </summary>
-/// <param name="b">Byte to print.</param>
+/// <param name="b">Wide char to print.</param>
 void PrintWcharStdErr(const wchar_t b);
 
 /// <summary>

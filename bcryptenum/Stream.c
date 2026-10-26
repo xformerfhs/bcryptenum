@@ -20,10 +20,11 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.0.0
+// Version: 1.0.1
 //
 // Change history:
 //    2026-10-23: V1.0.0: Created.
+//    2026-10-26: V1.0.1: Removed unnecessary "const" modifier from parameter declaration.
 //
 
 #include <stdlib.h>
@@ -47,7 +48,7 @@
 /// <param name="s">Wide characters to write.</param>
 /// <param name="len">Number of characters.</param>
 /// <returns>TRUE, if writing worked; false, if not.</returns>
-static BOOL WriteToConsole(const HANDLE h, const wchar_t* s, DWORD len) {
+static BOOL WriteToConsole(HANDLE h, const wchar_t* s, DWORD len) {
    return WriteConsoleW(h, s, len, NULL, NULL);
 }
 
@@ -58,7 +59,7 @@ static BOOL WriteToConsole(const HANDLE h, const wchar_t* s, DWORD len) {
 /// <param name="s">Wide characters to write.</param>
 /// <param name="len">Number of characters.</param>
 /// <returns>TRUE, if writing worked; false, if not.</returns>
-static BOOL WriteToFile(const HANDLE h, const wchar_t* s, DWORD len) {
+static BOOL WriteToFile(HANDLE h, const wchar_t* s, DWORD len) {
    char buf[CHUNK_BYTE_LEN];
 
    while (len > 0) {
@@ -105,7 +106,7 @@ static BOOL IsConsole(HANDLE h) {
 /// </summary>
 /// <param name="stream"Pointer to output stream.</param>
 /// <param name="stdId">Standard id of the handle.</param>
-static void ActOutStreamInit(OUT_STREAM* stream, DWORD stdId) {
+static void InitOutStream(OUT_STREAM* stream, DWORD stdId) {
    stream->handle = GetStdHandle(stdId);
    stream->write = IsConsole(stream->handle) ? WriteToConsole : WriteToFile;
 }
@@ -120,8 +121,8 @@ static void ActOutStreamInit(OUT_STREAM* stream, DWORD stdId) {
 /// <param name="errStream">Pointer to standard error stream.</param>
 void OutStreamInit(OUT_STREAM* outStream, OUT_STREAM* errStream) {
    if (outStream != NULL)
-      ActOutStreamInit(outStream, STD_OUTPUT_HANDLE);
+      InitOutStream(outStream, STD_OUTPUT_HANDLE);
 
    if (errStream != NULL)
-      ActOutStreamInit(errStream, STD_ERROR_HANDLE);
+      InitOutStream(errStream, STD_ERROR_HANDLE);
 }

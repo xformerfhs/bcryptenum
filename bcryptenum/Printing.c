@@ -22,13 +22,14 @@
 //
 // Author: Frank Schwab
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Change history:
 //    2026-01-13: V1.0.0: Created.
 //    2026-01-15: V2.0.0: Completely reworked to use wide char input and output with code pages.
 //    2026-01-15: V3.0.0: Offer byte and wchar functions, make output codepage available.
 //    2026-10-23: V4.0.0: Converted to wchar and streams.
+//    2026-10-26: V4.1.0: Corrected writing of error messages to wrong stream.
 //
 
 #include <Windows.h>
@@ -138,20 +139,20 @@ void InitializePrinting() {
 /// Print a wide char buffer to standard output.
 /// </summary>
 /// <param name="buffer">Buffer to print.</param>
-/// <param name="bufferCount">Count of bytes in buffer.</param>
-void PrintWcharBufferStdOut(const wchar_t* const buffer, const uint32_t bufferCount) {
-	if (bufferCount != 0)
-		outStream.write(outStream.handle, buffer, bufferCount);
+/// <param name="charCount">Count of characters in buffer.</param>
+void PrintWcharBufferStdOut(const wchar_t* const buffer, const uint32_t charCount) {
+	if (charCount != 0)
+		outStream.write(outStream.handle, buffer, charCount);
 }
 
 /// <summary>
 /// Print a wide char buffer to standard error.
 /// </summary>
 /// <param name="buffer">Buffer to print.</param>
-/// <param name="bufferCount">Count of bytes in buffer.</param>
-void PrintWcharBufferStdErr(const wchar_t* const buffer, const uint32_t bufferCount) {
-	if (bufferCount != 0)
-		outStream.write(errStream.handle, buffer, bufferCount);
+/// <param name="charCount">Count of characters in buffer.</param>
+void PrintWcharBufferStdErr(const wchar_t* const buffer, const uint32_t charCount) {
+	if (charCount != 0)
+		errStream.write(errStream.handle, buffer, charCount);
 }
 
 /// <summary>

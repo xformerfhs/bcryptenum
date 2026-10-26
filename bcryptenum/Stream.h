@@ -5,7 +5,7 @@
 /// <summary>
 /// Function prototype for write functions.
 /// </summary>
-typedef BOOL(*WRITE_FN)(const HANDLE h, const wchar_t* s, DWORD len);
+typedef BOOL(*WRITE_FN)(HANDLE h, const wchar_t* s, DWORD len);
 
 /// <summary>
 /// Output stream structure.
