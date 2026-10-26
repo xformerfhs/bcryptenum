@@ -22,7 +22,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 4.1.0
+// Version: 4.1.1
 //
 // Change history:
 //    2026-01-13: V1.0.0: Created.
@@ -30,6 +30,7 @@
 //    2026-01-15: V3.0.0: Offer byte and wchar functions, make output codepage available.
 //    2026-10-23: V4.0.0: Converted to wchar and streams.
 //    2026-10-26: V4.1.0: Corrected writing of error messages to wrong stream.
+//    2026-10-26: V4.1.1: Use safer outstream functions.
 //
 
 #include <Windows.h>
@@ -76,7 +77,7 @@ static OUT_STREAM errStream;
 /// <param name="size">Size of number.</param>
 /// <param name="hexDigits">List of hex digits.</param>
 static void PrintHex(
-	const OUT_STREAM* stream,
+	OUT_STREAM* stream,
 	uint32_t number, 
 	const uint8_t size, 
 	const wchar_t* const hexDigits
@@ -84,23 +85,23 @@ static void PrintHex(
 	// Maximum 8 hex digits for uint32_t.
 	wchar_t hexBuffer[8];
 	wchar_t* p = &hexBuffer[8];  // Initialize pointer to be one past the end of the buffer.
-	uint8_t length = 0;
+	uint8_t count = 0;
 
 	// Convert number to hex digits (at least one digit).
 	do {
 		*--p = hexDigits[number & 0x0F];
 		number >>= 4;
-		length++;
+		count++;
 	} while (number != 0);
 
 	// Prepend leading zeros, if necessary.
-	while (length < size) {
+	while (count < size) {
 		*--p = L'0';
-		length++;
+		count++;
 	}
 
 	// Write the string to the output.
-	stream->write(stream->handle, p, (DWORD)length);
+	OutStreamPointerWrite(stream, p, (DWORD)count);
 }
 
 /// <summary>
@@ -108,21 +109,21 @@ static void PrintHex(
 /// </summary>
 /// <param name="stream">Output stream.</param>
 /// <param name="number">Integer to print.</param>
-static void PrintUint32(const OUT_STREAM* stream, uint32_t number) {
+static void PrintUint32(OUT_STREAM* stream, uint32_t number) {
 	wchar_t numberBuffer[10];  // Maximum 10 decimal digits for uint32_t.
 	wchar_t* p = &numberBuffer[10]; // Initialize pointer to be one past the end of the buffer.
 
 	// Convert the number to string in reverse order.
-	uint8_t length = 0;
+	uint8_t count = 0;
 	do {
 		uint16_t digit = number % 10;
 		*--p = (L'0' + digit);
 		number /= 10;
-		length++;
+		count++;
 	} while (number != 0);
 
 	// Write the string to the output.
-	stream->write(stream->handle, p, (DWORD)length);
+	OutStreamPointerWrite(stream, p, (DWORD)count);
 }
 
 
@@ -142,7 +143,7 @@ void InitializePrinting() {
 /// <param name="charCount">Count of characters in buffer.</param>
 void PrintWcharBufferStdOut(const wchar_t* const buffer, const uint32_t charCount) {
 	if (charCount != 0)
-		outStream.write(outStream.handle, buffer, charCount);
+		OutStreamWrite(outStream, buffer, charCount);
 }
 
 /// <summary>
@@ -152,7 +153,7 @@ void PrintWcharBufferStdOut(const wchar_t* const buffer, const uint32_t charCoun
 /// <param name="charCount">Count of characters in buffer.</param>
 void PrintWcharBufferStdErr(const wchar_t* const buffer, const uint32_t charCount) {
 	if (charCount != 0)
-		errStream.write(errStream.handle, buffer, charCount);
+		OutStreamWrite(errStream, buffer, charCount);
 }
 
 /// <summary>
@@ -160,7 +161,7 @@ void PrintWcharBufferStdErr(const wchar_t* const buffer, const uint32_t charCoun
 /// </summary>
 /// <param name="str">String to print.</param>
 void PrintWcharStringStdOut(const wchar_t* const str) {
-	outStream.write(outStream.handle, str, WcharStringLength(str));
+	OutStreamWrite(outStream, str, WcharStringLength(str));
 }
 
 /// <summary>
@@ -168,7 +169,7 @@ void PrintWcharStringStdOut(const wchar_t* const str) {
 /// </summary>
 /// <param name="str">String to print.</param>
 void PrintWcharStringStdErr(const wchar_t* const str) {
-	errStream.write(errStream.handle, str, WcharStringLength(str));
+	OutStreamWrite(errStream, str, WcharStringLength(str));
 }
 
 /// <summary>
@@ -178,7 +179,7 @@ void PrintWcharStringStdErr(const wchar_t* const str) {
 void PrintWcharStdOut(const wchar_t b) {
 	wchar_t temp[1];
 	temp[0] = b;
-	outStream.write(outStream.handle, temp, 1);
+	OutStreamWrite(outStream, temp, 1);
 }
 
 /// <summary>
@@ -188,7 +189,7 @@ void PrintWcharStdOut(const wchar_t b) {
 void PrintWcharStdErr(const wchar_t b) {
 	wchar_t temp[1];
 	temp[0] = b;
-	errStream.write(errStream.handle, temp, 1);
+	OutStreamWrite(errStream, temp, 1);
 }
 
 /// <summary>

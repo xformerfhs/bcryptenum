@@ -20,11 +20,12 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.0.1
+// Version: 1.0.2
 //
 // Change history:
 //    2026-10-23: V1.0.0: Created.
 //    2026-10-26: V1.0.1: Removed unnecessary "const" modifier from parameter declaration.
+//    2026-10-26: V1.0.2: Renamed "len" to "charCount".
 //
 
 #include <stdlib.h>
@@ -48,8 +49,8 @@
 /// <param name="s">Wide characters to write.</param>
 /// <param name="len">Number of characters.</param>
 /// <returns>TRUE, if writing worked; false, if not.</returns>
-static BOOL WriteToConsole(HANDLE h, const wchar_t* s, DWORD len) {
-   return WriteConsoleW(h, s, len, NULL, NULL);
+static BOOL WriteToConsole(HANDLE h, const wchar_t* s, DWORD charCount) {
+   return WriteConsoleW(h, s, charCount, NULL, NULL);
 }
 
 /// <summary>
@@ -59,14 +60,14 @@ static BOOL WriteToConsole(HANDLE h, const wchar_t* s, DWORD len) {
 /// <param name="s">Wide characters to write.</param>
 /// <param name="len">Number of characters.</param>
 /// <returns>TRUE, if writing worked; false, if not.</returns>
-static BOOL WriteToFile(HANDLE h, const wchar_t* s, DWORD len) {
+static BOOL WriteToFile(HANDLE h, const wchar_t* s, DWORD charCount) {
    char buf[CHUNK_BYTE_LEN];
 
-   while (len > 0) {
-      DWORD chunkLen = min(len, CHUNK_CHAR_LEN);
+   while (charCount > 0) {
+      DWORD chunkLen = min(charCount, CHUNK_CHAR_LEN);
 
       // Ensure we do not split a surrogate pair.
-      if (chunkLen < len && IS_HIGH_SURROGATE(s[chunkLen - 1]))
+      if (chunkLen < charCount && IS_HIGH_SURROGATE(s[chunkLen - 1]))
          chunkLen--;
 
       int n = WideCharToMultiByte(CP_UTF8, 0, s, (int)chunkLen, buf, sizeof buf, NULL, NULL);
@@ -85,7 +86,7 @@ static BOOL WriteToFile(HANDLE h, const wchar_t* s, DWORD len) {
       }
 
       s += chunkLen;
-      len -= chunkLen;
+      charCount -= chunkLen;
    }
 
    return TRUE;

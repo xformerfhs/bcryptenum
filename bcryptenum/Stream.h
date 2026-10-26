@@ -21,3 +21,13 @@ typedef struct {
 /// <param name="outStream">Pointer to standard output stream.</param>
 /// <param name="errStream">Pointer to standard error stream.</param>
 void OutStreamInit(OUT_STREAM* outStream, OUT_STREAM* errStream);
+
+/// <summary>
+/// Write to an out stream.
+/// </summary>
+#define OutStreamWrite(os, buf, count) os.write(os.handle, buf, count)
+
+/// <summary>
+/// Write to the pointer of an out stream.
+/// </summary>
+#define OutStreamPointerWrite(os, buf, count) os->write(os->handle, buf, count)
